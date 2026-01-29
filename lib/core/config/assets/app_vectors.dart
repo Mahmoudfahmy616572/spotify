@@ -8,4 +8,6 @@ class AppVectors {
   static const String bottomRightUnion = "${basePath}bottomRightUnion$format";
   static const String appleLogo = "${basePath}apple$format";
   static const String googleLogo = "${basePath}google$format";
+  static const String topHomeCard = "${basePath}Frame 2$format";
+  static const String playMusicIcon = "${basePath}Play$format";
 }

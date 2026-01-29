@@ -1,7 +1,7 @@
-class UserLogedReq {
+class SigninReq {
   final String email;
   final String password;
-  UserLogedReq({
+  SigninReq({
     required this.email,
     required this.password,
   });

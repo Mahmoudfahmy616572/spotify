@@ -5,4 +5,5 @@ class AppImages {
   static const String chooseMoode = "${basePath}ChoosemodeImg.png";
   static const String bottomLeftRegAndSigninImg =
       "${basePath}bottomLeftRegAndSigninImg.png";
+  static const String topHomeImage = "${basePath}beilli1.png";
 }

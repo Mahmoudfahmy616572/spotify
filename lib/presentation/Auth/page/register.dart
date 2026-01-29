@@ -4,11 +4,11 @@ import 'package:flutter_svg/svg.dart';
 import 'package:spotify/common/appbar/basic_appbar.dart';
 import 'package:spotify/common/widget/basic_elevatedbutton.dart';
 import 'package:spotify/core/config/assets/app_vectors.dart';
-import 'package:spotify/data/models/auth/create_user_req.dart';
-import 'package:spotify/domain/usecase/auth/sign_up_usecase.dart';
-import 'package:spotify/presentation/Home/home_page.dart';
-import 'package:spotify/serviece_locator.dart';
+import 'package:spotify/domain/usecase/auth/sighnup_usecase.dart';
 
+import '../../../data/models/auth/create_user_req.dart';
+import '../../../serviece_locator.dart';
+import '../../Home/pages/home_page.dart';
 import 'widgets/google_or_apple_btn.dart';
 import 'widgets/row_text_and_textbtn.dart';
 
@@ -65,7 +65,7 @@ class RegisterPage extends StatelessWidget {
               basicElevetedButton(
                   title: "Register",
                   onPressed: () async {
-                    var result = await getIt<SignUpUsecase>().call(
+                    var result = await getIt<SighnupUsecase>().call(
                         param: CreateUserReq(
                       email: _emailController.text.toString(),
                       password: _passwordController.text.toString(),
@@ -77,12 +77,16 @@ class RegisterPage extends StatelessWidget {
                         behavior: SnackBarBehavior.floating,
                       );
                       ScaffoldMessenger.of(context).showSnackBar(snackbar);
-                    }, (r) {
-                      Navigator.pushAndRemoveUntil(
+                    }, (r) async {
+                      var snackbar = SnackBar(
+                        content: Text(r),
+                        behavior: SnackBarBehavior.floating,
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                      await Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                const HomePage()),
+                            builder: (BuildContext context) => HomePage()),
                         (route) => false,
                       );
                     });

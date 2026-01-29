@@ -1,15 +1,27 @@
 import 'package:get_it/get_it.dart';
-import 'package:spotify/data/sources/auth_firebase_servieces.dart';
-import 'package:spotify/domain/repository/auth/auth_repository.dart';
-import 'package:spotify/domain/usecase/auth/sign_up_usecase.dart';
-import 'package:spotify/domain/usecase/auth/signin_usecase.dart';
+import 'package:spotify/data/repositories/auth/auth_repo_impl.dart';
+import 'package:spotify/data/sources/auth/auth_supabase_servieces.dart';
+import 'package:spotify/domain/repositories/auth/auth_repo.dart';
+import 'package:spotify/domain/usecase/auth/sighnup_usecase.dart';
 
-import 'data/repository/auth/auth_repo_imp.dart';
+import 'data/sources/songs/get_songs_supabase_servieces.dart';
+import 'domain/usecase/auth/signin_usecase.dart';
 
 final getIt = GetIt.instance;
 Future<void> intializedDependences() async {
-  getIt.registerSingleton<AuthFirebaseServieces>(AuthFirebaseServiecesIpml());
-  getIt.registerSingleton<AuthRepository>(AuthRepoImp());
-  getIt.registerSingleton<SignUpUsecase>(SignUpUsecase());
-  getIt.registerSingleton<SigninUsecase>(SigninUsecase());
+  getIt.registerSingleton<AuthSupabaseServieces>(AuthSupabaseServiecesImpl());
+
+  getIt.registerSingleton<AuthRepo>(
+    AuthRepoImpl(),
+  );
+
+  getIt.registerSingleton<SighnupUsecase>(
+    SighnupUsecase(),
+  );
+  getIt.registerSingleton<SigninUsecase>(
+    SigninUsecase(),
+  );
+  getIt.registerSingleton<SongsSupabaseServieces>(
+    SongsSupabaseServiecesimpl(),
+  );
 }

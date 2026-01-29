@@ -1,4 +1,3 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,8 +6,8 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:spotify/core/config/theme/app_theme.dart';
 import 'package:spotify/presentation/chooseMode/bloc/theme_cubit.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'firebase_options.dart';
 import 'presentation/splash/splash_screen.dart';
 import 'serviece_locator.dart';
 
@@ -19,12 +18,20 @@ Future<void> main() async {
         ? HydratedStorageDirectory.web
         : HydratedStorageDirectory((await getTemporaryDirectory()).path),
   );
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
+  // await Firebase.initializeApp(
+  //   options: DefaultFirebaseOptions.currentPlatform,
+  // );
+  await Supabase.initialize(
+    url: 'https://nmwxcvzanmtlbfupraki.supabase.co',
+    anonKey:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5td3hjdnphbm10bGJmdXByYWtpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczNTIyMzEsImV4cCI6MjA4MjkyODIzMX0.TWKHC5BJdZh5YahxuekQjbt2lfUR4ogQSNj99SsSRK0',
   );
+
   await intializedDependences();
   runApp(const MyApp());
 }
+
+final supabase = Supabase.instance.client;
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -33,7 +40,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [BlocProvider(create: (_) => ThemeCubit())],
+      providers: [
+        BlocProvider(create: (_) => ThemeCubit()),
+      
+      ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, state) {
           return ScreenUtilInit(

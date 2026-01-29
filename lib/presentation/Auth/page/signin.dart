@@ -4,12 +4,12 @@ import 'package:flutter_svg/svg.dart';
 import 'package:spotify/common/appbar/basic_appbar.dart';
 import 'package:spotify/common/helper/is_dark_mode.dart';
 import 'package:spotify/core/config/assets/app_vectors.dart';
-import 'package:spotify/data/models/auth/user_loged_req.dart';
-import 'package:spotify/domain/usecase/auth/signin_usecase.dart';
-import 'package:spotify/serviece_locator.dart';
 
 import '../../../common/widget/basic_elevatedbutton.dart';
-import '../../Home/home_page.dart';
+import '../../../data/models/auth/signin_req.dart';
+import '../../../domain/usecase/auth/signin_usecase.dart';
+import '../../../serviece_locator.dart';
+import '../../Home/pages/home_page.dart';
 import 'widgets/google_or_apple_btn.dart';
 import 'widgets/row_text_and_textbtn.dart';
 
@@ -81,29 +81,29 @@ class SigninPage extends StatelessWidget {
                   title: "Sign In",
                   onPressed: () async {
                     var result = await getIt<SigninUsecase>().call(
-                        param: UserLogedReq(
+                        param: SigninReq(
                       email: _emailController.text.toString(),
                       password: _passwordController.text.toString(),
                     ));
-                    result.fold((l) {
+                    result.fold((l) async {
                       var snackBar = SnackBar(
                         content: Text(l),
                         behavior: SnackBarBehavior.floating,
                       );
                       ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                    }, (r) {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                const HomePage()),
-                        (route) => false,
-                      );
+                    }, (r) async {
                       var snackBar = SnackBar(
                         content: Text(r),
                         behavior: SnackBarBehavior.floating,
                       );
                       ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      await Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                 HomePage()),
+                        (route) => false,
+                      );
                     });
                   }),
               SizedBox(
