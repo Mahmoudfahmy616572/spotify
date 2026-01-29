@@ -42,7 +42,6 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => ThemeCubit()),
-      
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, state) {

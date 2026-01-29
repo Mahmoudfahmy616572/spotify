@@ -66,7 +66,7 @@ class SigninAndSignup extends StatelessWidget {
                     children: [
                       Expanded(
                           flex: 1,
-                          child: basicElevetedButton(
+                          child: BasicElevatedbutton(
                               title: "Register",
                               onPressed: () {
                                 Navigator.push(

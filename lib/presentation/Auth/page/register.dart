@@ -62,7 +62,7 @@ class RegisterPage extends StatelessWidget {
               SizedBox(
                 height: 33.h,
               ),
-              basicElevetedButton(
+              BasicElevatedbutton(
                   title: "Register",
                   onPressed: () async {
                     var result = await getIt<SighnupUsecase>().call(

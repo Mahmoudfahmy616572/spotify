@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class basicElevetedButton extends StatelessWidget {
-  const basicElevetedButton({
+class BasicElevatedbutton extends StatelessWidget {
+  const BasicElevatedbutton({
     super.key,
     required this.title,
     required this.onPressed,

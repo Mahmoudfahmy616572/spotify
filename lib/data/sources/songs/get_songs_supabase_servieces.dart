@@ -30,9 +30,7 @@ class SongsSupabaseServiecesimpl implements SongsSupabaseServieces {
           publicSongsUrl =
               supabase.storage.from('songs').getPublicUrl(song.urlSongsbase);
         }
-        // final publicImageUrl = supabase.storage
-        //     .from('covers') // Your bucket name
-        //     .getPublicUrl(song.imageUrl);
+
         final String publicImageUrl;
         if (song.imageUrl.startsWith('http')) {
           publicImageUrl = song.imageUrl; // It's already a full URL!
@@ -41,7 +39,6 @@ class SongsSupabaseServiecesimpl implements SongsSupabaseServieces {
               supabase.storage.from('covers').getPublicUrl(song.imageUrl);
         }
 
-        // Optional: Overwrite urlbase with the full public URL for playback
         return SongModel(
           id: song.id,
           title: song.title,

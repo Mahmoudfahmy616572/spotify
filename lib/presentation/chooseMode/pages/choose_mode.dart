@@ -68,7 +68,7 @@ class ChooseMode extends StatelessWidget {
                   const SizedBox(
                     height: 37,
                   ),
-                  basicElevetedButton(
+                  BasicElevatedbutton(
                     title: 'Continue',
                     onPressed: () {
                       Navigator.push(

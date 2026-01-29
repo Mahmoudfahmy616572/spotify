@@ -77,7 +77,7 @@ class SigninPage extends StatelessWidget {
               SizedBox(
                 height: 10.h,
               ),
-              basicElevetedButton(
+              BasicElevatedbutton(
                   title: "Sign In",
                   onPressed: () async {
                     var result = await getIt<SigninUsecase>().call(

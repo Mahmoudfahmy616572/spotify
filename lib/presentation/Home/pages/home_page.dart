@@ -7,6 +7,7 @@ import 'package:spotify/presentation/Home/widgets/new_songs.dart';
 
 import '../../../core/config/assets/app_images.dart';
 import '../../../core/config/assets/app_vectors.dart';
+import '../widgets/play_list.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -20,7 +21,6 @@ class _HomePageState extends State<HomePage>
   late TabController _tabController;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
   }
@@ -37,24 +37,32 @@ class _HomePageState extends State<HomePage>
             fit: BoxFit.fill,
           ),
         ),
-        body: Column(
-          children: [
-            _topHomeCard(),
-            _tabs(),
-            SizedBox(
-              height: 260.h,
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  const NewSongs(),
-                  Container(),
-                  Container(),
-                  Container(),
-                ],
-              ),
-            )
-          ],
-        ));
+        body: Builder(builder: (context) {
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                _topHomeCard(),
+                _tabs(),
+                SizedBox(
+                  height: 260.h,
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      const NewSongs(),
+                      Container(),
+                      Container(),
+                      Container(),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 20.h,
+                ),
+                SizedBox(height: 500.h, child: const GetPlayList())
+              ],
+            ),
+          );
+        }));
   }
 
   Widget _tabs() {

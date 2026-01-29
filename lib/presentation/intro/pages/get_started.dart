@@ -47,7 +47,7 @@ class GetStarted extends StatelessWidget {
                   SizedBox(
                     height: 37,
                   ),
-                  basicElevetedButton(
+                  BasicElevatedbutton(
                     title: 'Get started',
                     onPressed: () {
                       Navigator.pushReplacement(
