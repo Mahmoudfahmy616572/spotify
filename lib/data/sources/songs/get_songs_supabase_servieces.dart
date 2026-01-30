@@ -43,10 +43,11 @@ class SongsSupabaseServiecesimpl implements SongsSupabaseServieces {
           id: song.id,
           title: song.title,
           artist: song.artist,
-          urlSongsbase: publicSongsUrl, // Full URL now
+          urlSongsbase: publicSongsUrl,
           imageUrl: publicImageUrl,
           duration: song.duration,
           releaseDate: song.releaseDate,
+          lyrics: song.lyrics,
         );
       }).toList();
       return Right(songs);

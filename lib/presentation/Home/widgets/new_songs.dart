@@ -51,6 +51,8 @@ class NewSongs extends StatelessWidget {
                       MaterialPageRoute(
                           builder: (context) => SongsPlayPage(
                                 songModel: songs[index],
+                                songs: songs,
+                                index: index,
                               )));
                 },
                 child: Column(children: [

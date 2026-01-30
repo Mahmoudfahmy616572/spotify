@@ -5,6 +5,7 @@ class SongModel {
   final String urlSongsbase; // The path/name stored in your bucket
   final String imageUrl; // The path/name stored in your bucket
   final String duration;
+  final String lyrics;
   final DateTime releaseDate;
 
   SongModel({
@@ -15,6 +16,7 @@ class SongModel {
     required this.imageUrl,
     required this.duration,
     required this.releaseDate,
+    required this.lyrics,
   });
 
   factory SongModel.fromJson(Map<String, dynamic> json) {
@@ -28,6 +30,7 @@ class SongModel {
           json['imageUrl'], // This should be the filename or path in Storage
       duration: json['duration']?.toString() ?? '0:00',
       releaseDate: DateTime.parse(json['releaseDate']),
+      lyrics: '${json['lyrics'] ?? ''}',
     );
   }
 }
