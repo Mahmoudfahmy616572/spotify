@@ -1,7 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:meta/meta.dart';
-
 part 'song_player_state.dart';
 
 class SongPlayerCubit extends Cubit<SongPlayerState> {
