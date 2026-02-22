@@ -7,7 +7,7 @@ A professional music streaming application built with **Flutter** and **Supabase
 * **Interactive Playback:** Seek audio by tapping specific lyric lines.
 * **Relational Backend:** Powered by **Supabase (PostgreSQL)** for managing artists, albums, and tracks.
 * **Secure Auth:** User authentication and session management via Supabase Auth.
-* **State Management:** Clean implementation using the **BLoC** pattern for predictable UI states.
+* **State Management:** Clean implementation using the **BLoC/Cubit** pattern for predictable UI states.
 
 ## 🛠️ Technical Stack
 * **Frontend:** [Flutter](https://flutter.dev) (Dart)

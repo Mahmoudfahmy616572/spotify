@@ -10,7 +10,8 @@ class AppVectors {
   static const String googleLogo = "${basePath}google$format";
   static const String topHomeCard = "${basePath}Frame 2$format";
   static const String playMusicIcon = "${basePath}Play$format";
-  static const String loveSong = "${basePath}LoveSong$format";
+  static const String loveSongFilled = "${basePath}LoveSong$format";
+  static const String loveSongUnfilled = "${basePath}loveSongUnfilled$format";
   static const String previousSong = "${basePath}Previous$format";
   static const String nextSong = "${basePath}Next$format";
   static const String shuffle = "${basePath}Shuffle$format";

@@ -3,25 +3,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart'
+    show ItemScrollController, ScrollablePositionedList;
 import 'package:spotify/common/appbar/basic_appbar.dart';
 import 'package:spotify/common/helper/is_dark_mode.dart';
 import 'package:spotify/core/config/theme/app_colors.dart';
 import 'package:spotify/data/models/songs/songs_model.dart';
-import 'package:spotify/presentation/songsPlayPage/cubit/cubit/song_player_cubit.dart';
+import 'package:spotify/presentation/songsPlayPage/cubit/DownloadSongsCubit/cubit/download_songs_for_offline_cubit.dart';
 import 'package:spotify/presentation/songsPlayPage/widgets/define_lyrics_format.dart'
     show parseLyrics;
 
 import '../../core/config/assets/app_vectors.dart';
+import '../Home/cubit/FavoutriteCubitAndState/cubit/favourite_songs_cubit.dart'
+    show FavouriteSongsCubit, FavouriteSongsState;
+import 'cubit/song_player_cubit.dart';
 
 class SongsPlayPage extends StatelessWidget {
-  const SongsPlayPage(
+  SongsPlayPage(
       {super.key,
       required this.songModel,
       required this.songs,
       required this.index});
+  final ItemScrollController itemScrollController = ItemScrollController();
   final SongModel songModel;
   final List<SongModel> songs;
   final int index;
+  int _currentLineIndex = -1;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,64 +73,88 @@ class SongsPlayPage extends StatelessWidget {
                                   const Icon(Icons.music_note),
                             ),
                           ),
-                          Positioned.fill(
-                            child: Container(
-                              color: Colors.black.withOpacity(0.5),
+                          if (state is SongPlayerLoaded &&
+                              state.isLyricsVisable)
+                            Positioned.fill(
+                              child: Container(
+                                color: Colors.black.withOpacity(0.6),
+                              ),
                             ),
-                          ),
                           Positioned.fill(
-                            child: StreamBuilder<Duration>(
-                              stream: context
-                                  .read<SongPlayerCubit>()
-                                  .audioPlayer
-                                  .positionStream,
-                              builder: (context, snapshot) {
-                                final currentPosition =
-                                    snapshot.data ?? Duration.zero;
-                                final parsedLyrics =
-                                    parseLyrics(currrentIndex.lyrics);
-
-                                if (parsedLyrics.isEmpty) {
-                                  return const Center(
-                                      child: Text("No Lyrics",
-                                          style:
-                                              TextStyle(color: Colors.white)));
+                            child:
+                                BlocBuilder<SongPlayerCubit, SongPlayerState>(
+                              builder: (context, state) {
+                                final bool isvisible =
+                                    state is SongPlayerLoaded &&
+                                        state.isLyricsVisable;
+                                if (!isvisible) {
+                                  return const SizedBox.shrink();
                                 }
+                                return StreamBuilder<Duration>(
+                                  stream: context
+                                      .read<SongPlayerCubit>()
+                                      .audioPlayer
+                                      .positionStream,
+                                  builder: (context, snapshot) {
+                                    final rowPosition =
+                                        snapshot.data ?? Duration.zero;
+                                    final currentPosition = rowPosition -
+                                        const Duration(milliseconds: 1700);
+                                    final parsedLyrics =
+                                        parseLyrics(currrentIndex.lyrics);
+                                    int activeIndex =
+                                        parsedLyrics.lastIndexWhere((line) =>
+                                            currentPosition >= line.startTime);
 
-                                return ListView.builder(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 40.h, horizontal: 20.w),
-                                  itemCount: parsedLyrics.length,
-                                  itemBuilder: (context, index) {
-                                    final line = parsedLyrics[index];
-                                    // Highlight Logic
-                                    final isHighlighted =
-                                        currentPosition >= line.startTime &&
-                                            (index == parsedLyrics.length - 1 ||
-                                                currentPosition <
-                                                    parsedLyrics[index + 1]
-                                                        .startTime);
+                                    if (parsedLyrics.isEmpty) {
+                                      return const Center(
+                                          child: Text("No Lyrics",
+                                              style: TextStyle(
+                                                  color: Colors.white)));
+                                    }
+                                    if (activeIndex != -1 &&
+                                        activeIndex != _currentLineIndex &&
+                                        itemScrollController.isAttached) {
+                                      _currentLineIndex = activeIndex;
+                                      itemScrollController.scrollTo(
+                                        index: activeIndex,
+                                        duration:
+                                            const Duration(milliseconds: 600),
+                                        curve: Curves.easeInOutCubic,
+                                        alignment: 0.1,
+                                      );
+                                    }
 
-                                    return AnimatedDefaultTextStyle(
-                                      duration:
-                                          const Duration(milliseconds: 300),
-                                      style: TextStyle(
-                                        fontSize: isHighlighted ? 22.sp : 18.sp,
-                                        fontWeight: isHighlighted
-                                            ? FontWeight.bold
-                                            : FontWeight.normal,
-                                        color: isHighlighted
-                                            ? Colors.white
-                                            : Colors.white.withOpacity(0.5),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 10.0),
-                                        child: Text(
-                                          line.text,
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
+                                    return ScrollablePositionedList.builder(
+                                      itemScrollController:
+                                          itemScrollController,
+                                      itemCount: parsedLyrics.length,
+                                      itemBuilder: (context, index) {
+                                        final line = parsedLyrics[index];
+                                        final isHighlighted =
+                                            index == activeIndex;
+
+                                        return AnimatedDefaultTextStyle(
+                                          duration:
+                                              const Duration(milliseconds: 300),
+                                          style: TextStyle(
+                                            fontSize:
+                                                isHighlighted ? 22.sp : 18.sp,
+                                            fontWeight: isHighlighted
+                                                ? FontWeight.bold
+                                                : FontWeight.normal,
+                                            color: isHighlighted
+                                                ? Colors.white
+                                                : Colors.white.withOpacity(0.5),
+                                          ),
+                                          child: Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 12.h),
+                                            child: Text(line.text,
+                                                textAlign: TextAlign.center),
+                                          ),
+                                        );
+                                      },
                                     );
                                   },
                                 );
@@ -151,13 +183,79 @@ class SongsPlayPage extends StatelessWidget {
                                     fontWeight: FontWeight.w400)),
                           ],
                         ),
-                        GestureDetector(
-                          onTap: () {},
-                          child: SvgPicture.asset(
-                            AppVectors.loveSong,
-                            width: 35.w,
-                            height: 35.h,
-                          ),
+                        Row(
+                          children: [
+                            BlocBuilder<DownloadSongsForOfflineCubit,
+                                DownloadSongsForOfflineState>(
+                              builder: (context, state) {
+                                final st =
+                                    state as DownloadSongsForOfflineLoaded;
+                                final progress =
+                                    st.downloads?[songs[index].id] ?? 0.0;
+                                final isDownloaded = st.completedIds
+                                        ?.contains(songs[index].id) ??
+                                    false;
+                                if (progress > 0 && progress < 1) {
+                                  return Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      CircularProgressIndicator(
+                                        value: progress,
+                                        strokeWidth: 2.5,
+                                        color: Colors.green,
+                                      ),
+                                      Text(
+                                        "${(progress * 100).toInt()}%",
+                                        style: TextStyle(
+                                            fontSize: 12.sp,
+                                            color: context.isDarkMode
+                                                ? Colors.white
+                                                : Colors.black),
+                                      ),
+                                    ],
+                                  );
+                                } else {
+                                  return IconButton(
+                                    onPressed: () {
+                                      context
+                                          .read<DownloadSongsForOfflineCubit>()
+                                          .downloadSongsForOffline(
+                                              songs[index]);
+                                    },
+                                    icon: isDownloaded
+                                        ? Icon(Icons.download_done)
+                                        : Icon(Icons.downloading_outlined),
+                                    color: isDownloaded
+                                        ? Colors.green
+                                        : Colors.grey,
+                                  );
+                                }
+                              },
+                            ),
+                            BlocBuilder<FavouriteSongsCubit,
+                                FavouriteSongsState>(
+                              builder: (context, state) {
+                                bool isFavourite = context
+                                    .read<FavouriteSongsCubit>()
+                                    .isFavourite(songs[index].id);
+                                return IconButton(
+                                  onPressed: () {
+                                    context
+                                        .read<FavouriteSongsCubit>()
+                                        .toggleFavourite(songs[index].id);
+                                  },
+                                  icon: Icon(
+                                    isFavourite
+                                        ? Icons.favorite
+                                        : Icons.favorite_border,
+                                    color: context.isDarkMode
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
+                                );
+                              },
+                            )
+                          ],
                         ),
                       ],
                     ),
@@ -198,7 +296,7 @@ class SongsPlayPage extends StatelessWidget {
                     .seekTo(Duration(seconds: value.toInt()));
               },
             ),
-            SizedBox(height: 10.h),
+            SizedBox(height: 5.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -207,7 +305,7 @@ class SongsPlayPage extends StatelessWidget {
               ],
             ),
             SizedBox(
-              height: 20.h,
+              height: 5.h,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -279,7 +377,19 @@ class SongsPlayPage extends StatelessWidget {
                   ),
                 ),
               ],
-            )
+            ),
+            SizedBox(
+              height: 5.h,
+            ),
+            Center(
+              child: TextButton(
+                onPressed: () {
+                  context.read<SongPlayerCubit>().toggleShowLyrics();
+                },
+                child:
+                    Text(state.isLyricsVisable ? "Hide Lyrics" : "Show Lyrics"),
+              ),
+            ),
           ],
         );
       } else if (state is SongPlayerFailure) {

@@ -100,8 +100,7 @@ class SigninPage extends StatelessWidget {
                       await Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                 HomePage()),
+                            builder: (BuildContext context) => HomePage()),
                         (route) => false,
                       );
                     });

@@ -4,10 +4,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:spotify/common/helper/is_dark_mode.dart';
 import 'package:spotify/data/models/songs/songs_model.dart';
-import 'package:spotify/presentation/Home/cubit/get_songs_cubit.dart';
+import 'package:spotify/presentation/Home/cubit/FavoutriteCubitAndState/cubit/favourite_songs_cubit.dart';
+import 'package:spotify/presentation/Home/cubit/getSongsCubitAndState/get_songs_cubit.dart';
 
 import '../../../core/config/assets/app_vectors.dart';
-import '../cubit/get_songs_state.dart';
+import '../../songsPlayPage/songs_play_page.dart';
+import '../cubit/getSongsCubitAndState/get_songs_state.dart';
 
 class GetPlayList extends StatelessWidget {
   const GetPlayList({super.key});
@@ -78,55 +80,67 @@ class GetPlayList extends StatelessWidget {
         itemBuilder: (contex, index) => Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      width: 35.w,
-                      height: 35.h,
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: context.isDarkMode
-                              ? const Color(0xff959595)
-                              : const Color(0xFFE6E6E6)),
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0.w),
-                        child: SvgPicture.asset(
-                          AppVectors.playMusicIcon,
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SongsPlayPage(
+                                  songs: songs,
+                                  index: index,
+                                  songModel: songs[index],
+                                )));
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        width: 35.w,
+                        height: 35.h,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: context.isDarkMode
+                                ? const Color(0xff959595)
+                                : const Color(0xFFE6E6E6)),
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0.w),
+                          child: SvgPicture.asset(
+                            AppVectors.playMusicIcon,
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      width: 23.w,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          songs[index].title,
-                          style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 17.h,
-                              color: contex.isDarkMode
-                                  ? const Color(0xFFD6D6D6)
-                                  : const Color(0xFF000000)),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(
-                          height: 5.h,
-                        ),
-                        Text(
-                          songs[index].artist,
-                          style: TextStyle(
-                              fontSize: 15.h,
-                              color: contex.isDarkMode
-                                  ? const Color(0xFFD6D6D6)
-                                  : const Color(0xFF000000)),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ],
+                      SizedBox(
+                        width: 23.w,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            songs[index].title,
+                            style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 17.h,
+                                color: contex.isDarkMode
+                                    ? const Color(0xFFD6D6D6)
+                                    : const Color(0xFF000000)),
+                            textAlign: TextAlign.center,
+                          ),
+                          SizedBox(
+                            height: 5.h,
+                          ),
+                          Text(
+                            songs[index].artist,
+                            style: TextStyle(
+                                fontSize: 15.h,
+                                color: contex.isDarkMode
+                                    ? const Color(0xFFD6D6D6)
+                                    : const Color(0xFF000000)),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
                 Row(
                   children: [
@@ -141,9 +155,28 @@ class GetPlayList extends StatelessWidget {
                     SizedBox(
                       width: 40.h,
                     ),
-                    GestureDetector(
-                        onTap: () {},
-                        child: SvgPicture.asset(AppVectors.loveSong)),
+                    BlocBuilder<FavouriteSongsCubit, FavouriteSongsState>(
+                      builder: (context, state) {
+                        bool isFavourite = context
+                            .read<FavouriteSongsCubit>()
+                            .isFavourite(songs[index].id);
+                        return IconButton(
+                          onPressed: () {
+                            context
+                                .read<FavouriteSongsCubit>()
+                                .toggleFavourite(songs[index].id);
+                          },
+                          icon: Icon(
+                            isFavourite
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: context.isDarkMode
+                                ? Colors.white
+                                : Colors.black,
+                          ),
+                        );
+                      },
+                    ),
                   ],
                 )
               ],

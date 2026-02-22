@@ -23,7 +23,7 @@ class AuthSupabaseServiecesImpl implements AuthSupabaseServieces {
 
       await Supabase.instance.client.from('Users').insert(
         {
-          'name': res.user?.userMetadata?["Full_name"],
+          'username': res.user?.userMetadata?["Full_name"],
           'email': res.user?.email,
         },
       );

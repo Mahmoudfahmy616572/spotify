@@ -1,11 +1,19 @@
+import 'dart:io' show File;
+
 import 'package:bloc/bloc.dart';
+import 'package:dio/dio.dart';
+import 'package:hive/hive.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:meta/meta.dart';
+import 'package:path_provider/path_provider.dart'
+    show getApplicationCacheDirectory;
 import 'package:spotify/data/models/songs/songs_model.dart';
 
 part 'song_player_state.dart';
 
 class SongPlayerCubit extends Cubit<SongPlayerState> {
+  bool _isLyricsVisable = false;
+
   final AudioPlayer audioPlayer = AudioPlayer();
   List<SongModel> playList = [];
   int currentIndex = 0;
@@ -29,10 +37,20 @@ class SongPlayerCubit extends Cubit<SongPlayerState> {
       }
     });
   }
-  void updateSongPlayer() {
-    if (!isClosed) emit(SongPlayerLoaded());
+  void toggleShowLyrics() {
+    if (state is SongPlayerLoaded) {
+      _isLyricsVisable = !_isLyricsVisable;
+      emit((state as SongPlayerLoaded).copyWith(
+        isLyricsVisible: _isLyricsVisable,
+      ));
+    }
   }
 
+  void updateSongPlayer() {
+    if (!isClosed) emit(SongPlayerLoaded(isLyricsVisable: _isLyricsVisable));
+  }
+
+  
   Future<void> loadSong(
       List<SongModel> songs, int index, String urlImage) async {
     playList = songs;
@@ -41,22 +59,29 @@ class SongPlayerCubit extends Cubit<SongPlayerState> {
 
     try {
       emit(SongPlayerLoading());
-      await audioPlayer.setUrl(songs[currentIndex].urlSongsbase);
+      final box = Hive.box('offline_songs');
+      final String? localPath = box.get(playList[currentIndex].id.toString());
+      if (localPath != null && await File(localPath).exists()) {
+        //(offline)
+        await audioPlayer.setFilePath(localPath);
+      } else {
+        //(online)
+        await audioPlayer.setUrl(songs[currentIndex].urlSongsbase);
+      }
       audioPlayer.play();
-      emit(SongPlayerLoaded());
+      emit(SongPlayerLoaded(isLyricsVisable: _isLyricsVisable));
     } catch (e) {
       emit(SongPlayerFailure(errorMessage: 'Failed to load song: $e'));
     }
   }
 
   void playNext() {
-    if (currentIndex > playList.length - 1) {
+    if (currentIndex < playList.length - 1) {
       currentIndex++;
-      loadSong(playList, currentIndex, url);
     } else {
       currentIndex = 0;
-      loadSong(playList, currentIndex, url);
     }
+    loadSong(playList, currentIndex, url);
   }
 
   void playPrevious() {
@@ -79,7 +104,7 @@ class SongPlayerCubit extends Cubit<SongPlayerState> {
     } else {
       await audioPlayer.play();
     }
-    emit(SongPlayerLoaded());
+    emit(SongPlayerLoaded(isLyricsVisable: _isLyricsVisable));
   }
 
   @override

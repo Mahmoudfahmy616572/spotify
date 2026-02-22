@@ -5,8 +5,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:spotify/common/helper/is_dark_mode.dart';
 import 'package:spotify/core/config/assets/app_vectors.dart';
-import 'package:spotify/presentation/Home/cubit/get_songs_cubit.dart';
-import 'package:spotify/presentation/Home/cubit/get_songs_state.dart';
+import 'package:spotify/presentation/Home/cubit/getSongsCubitAndState/get_songs_cubit.dart';
+import 'package:spotify/presentation/Home/cubit/getSongsCubitAndState/get_songs_state.dart';
 import 'package:spotify/presentation/songsPlayPage/songs_play_page.dart';
 
 import '../../../data/models/songs/songs_model.dart';
