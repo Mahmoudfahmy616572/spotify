@@ -44,8 +44,11 @@ class DownloadSongsForOfflineCubit extends Cubit<DownloadSongsForOfflineState> {
         newDownloads.remove(songs.id);
         final newCompletedIds = Set<String>.from(latestState.completedIds);
         newCompletedIds.add(songs.id);
-        final box = Hive.box("offline_songs");
-        await box.put(songs.id, savePath);
+        final pathBox = Hive.box("offline_songs");
+        await pathBox.put(songs.id, savePath);
+        final metaBox = Hive.box("songs_metadata");
+        await metaBox.put(songs.id, songs.toJson());
+
         emit(latestState.copyWith(
             downloads: newDownloads, completedIds: newCompletedIds));
       }

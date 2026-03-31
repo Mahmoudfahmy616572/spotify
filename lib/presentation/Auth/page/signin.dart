@@ -4,12 +4,12 @@ import 'package:flutter_svg/svg.dart';
 import 'package:spotify/common/appbar/basic_appbar.dart';
 import 'package:spotify/common/helper/is_dark_mode.dart';
 import 'package:spotify/core/config/assets/app_vectors.dart';
+import 'package:spotify/presentation/MainWrapper/main_wrapper.dart';
 
 import '../../../common/widget/basic_elevatedbutton.dart';
 import '../../../data/models/auth/signin_req.dart';
 import '../../../domain/usecase/auth/signin_usecase.dart';
 import '../../../serviece_locator.dart';
-import '../../Home/pages/home_page.dart';
 import 'widgets/google_or_apple_btn.dart';
 import 'widgets/row_text_and_textbtn.dart';
 
@@ -100,7 +100,7 @@ class SigninPage extends StatelessWidget {
                       await Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                            builder: (BuildContext context) => HomePage()),
+                            builder: (BuildContext context) => MainWrapper()),
                         (route) => false,
                       );
                     });

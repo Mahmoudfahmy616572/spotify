@@ -5,10 +5,10 @@ import 'package:spotify/common/appbar/basic_appbar.dart';
 import 'package:spotify/common/widget/basic_elevatedbutton.dart';
 import 'package:spotify/core/config/assets/app_vectors.dart';
 import 'package:spotify/domain/usecase/auth/sighnup_usecase.dart';
+import 'package:spotify/presentation/MainWrapper/main_wrapper.dart';
 
 import '../../../data/models/auth/create_user_req.dart';
 import '../../../serviece_locator.dart';
-import '../../Home/pages/home_page.dart';
 import 'widgets/google_or_apple_btn.dart';
 import 'widgets/row_text_and_textbtn.dart';
 
@@ -86,7 +86,7 @@ class RegisterPage extends StatelessWidget {
                       await Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                            builder: (BuildContext context) => HomePage()),
+                            builder: (BuildContext context) => MainWrapper()),
                         (route) => false,
                       );
                     });

@@ -18,6 +18,18 @@ class SongModel {
     required this.releaseDate,
     required this.lyrics,
   });
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'artist': artist,
+      'urlbase': urlSongsbase,
+      'imageUrl': imageUrl,
+      'duration': duration,
+      'releaseDate': releaseDate.toIso8601String(),
+      'lyrics': lyrics,
+    };
+  }
 
   factory SongModel.fromJson(Map<String, dynamic> json) {
     return SongModel(

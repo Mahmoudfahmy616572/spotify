@@ -44,6 +44,7 @@ dependencies:
   hydrated_bloc: ^10.1.1
   just_audio: ^0.10.5
   meta: ^1.17.0
+  palette_generator: ^0.3.3+7
   path_provider: ^2.1.5
   scrollable_positioned_list: ^0.3.8
   supabase_flutter: ^2.12.0

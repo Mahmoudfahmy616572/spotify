@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:spotify/common/helper/is_dark_mode.dart';
+import 'package:spotify/common/backButton/back_button.dart';
 
 class BasicAppbar extends StatelessWidget implements PreferredSizeWidget {
   const BasicAppbar(
@@ -15,26 +15,7 @@ class BasicAppbar extends StatelessWidget implements PreferredSizeWidget {
         title: title ?? const Text(''),
         actions: [actions ?? Container()],
         elevation: 0,
-        leading: isLeading
-            ? null
-            : IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: Container(
-                    height: 30,
-                    width: 30,
-                    decoration: BoxDecoration(
-                        color: context.isDarkMode
-                            ? Colors.white.withOpacity(0.3)
-                            : const Color(0xff414141).withOpacity(0.2),
-                        shape: BoxShape.circle),
-                    child: Icon(
-                      Icons.arrow_back_ios_new,
-                      size: 15,
-                      color: context.isDarkMode ? Colors.white : Colors.black,
-                    )),
-              ));
+        leading: isLeading ? null : backButton(context));
   }
 
   @override

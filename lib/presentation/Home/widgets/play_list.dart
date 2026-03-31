@@ -4,12 +4,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:spotify/common/helper/is_dark_mode.dart';
 import 'package:spotify/data/models/songs/songs_model.dart';
-import 'package:spotify/presentation/Home/cubit/FavoutriteCubitAndState/cubit/favourite_songs_cubit.dart';
-import 'package:spotify/presentation/Home/cubit/getSongsCubitAndState/get_songs_cubit.dart';
+import 'package:spotify/presentation/Home/cubit/get_songs_cubit.dart';
+import 'package:spotify/presentation/LikedSongs/cubit/favourite_songs_cubit.dart';
 
 import '../../../core/config/assets/app_vectors.dart';
 import '../../songsPlayPage/songs_play_page.dart';
-import '../cubit/getSongsCubitAndState/get_songs_state.dart';
+import '../cubit/get_songs_state.dart';
 
 class GetPlayList extends StatelessWidget {
   const GetPlayList({super.key});
@@ -77,7 +77,7 @@ class GetPlayList extends StatelessWidget {
   Widget _playlist(List<SongModel> songs, BuildContext context) {
     return ListView.separated(
         shrinkWrap: true,
-        itemBuilder: (contex, index) => Row(
+        itemBuilder: (context, index) => Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 GestureDetector(
@@ -120,7 +120,7 @@ class GetPlayList extends StatelessWidget {
                             style: TextStyle(
                                 fontWeight: FontWeight.w700,
                                 fontSize: 17.h,
-                                color: contex.isDarkMode
+                                color: context.isDarkMode
                                     ? const Color(0xFFD6D6D6)
                                     : const Color(0xFF000000)),
                             textAlign: TextAlign.center,
@@ -132,7 +132,7 @@ class GetPlayList extends StatelessWidget {
                             songs[index].artist,
                             style: TextStyle(
                                 fontSize: 15.h,
-                                color: contex.isDarkMode
+                                color: context.isDarkMode
                                     ? const Color(0xFFD6D6D6)
                                     : const Color(0xFF000000)),
                             textAlign: TextAlign.center,
@@ -157,14 +157,15 @@ class GetPlayList extends StatelessWidget {
                     ),
                     BlocBuilder<FavouriteSongsCubit, FavouriteSongsState>(
                       builder: (context, state) {
+                        final song = songs[index];
                         bool isFavourite = context
-                            .read<FavouriteSongsCubit>()
-                            .isFavourite(songs[index].id);
+                            .watch<FavouriteSongsCubit>()
+                            .isFavourite(song.id);
                         return IconButton(
                           onPressed: () {
                             context
                                 .read<FavouriteSongsCubit>()
-                                .toggleFavourite(songs[index].id);
+                                .toggleFavourite(song);
                           },
                           icon: Icon(
                             isFavourite
