@@ -1,0 +1,10 @@
+# Ignore the web build folder in language stats
+build/** linguist-vendored
+
+# Treat all .dart files as the primary language
+*.dart linguist-detectable=true
+
+# Optional: If you want to hide HTML from the stats entirely
+*.html linguist-detectable=false
+*.js linguist-detectable=false
+*.css linguist-detectable=false
