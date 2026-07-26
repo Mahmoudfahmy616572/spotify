@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:spotify/common/appbar/basic_appbar.dart';
-import 'package:spotify/common/helper/is_dark_mode.dart';
 import 'package:spotify/presentation/DownloadedSongs/downloadedSongs.dart';
 import 'package:spotify/presentation/LikedSongs/LikedSongs.dart'
     show LikedsongsPage;
 import 'package:spotify/presentation/LikedSongs/cubit/favourite_songs_cubit.dart';
+import 'package:spotify/presentation/LikedSongs/cubit/favourite_songs_state.dart';
 
 class LibraryPage extends StatelessWidget {
   const LibraryPage({super.key});
@@ -21,9 +21,9 @@ class LibraryPage extends StatelessWidget {
               Text(
                 'Your Library',
                 style: TextStyle(
-                    fontSize: 27,
+                    fontSize: 27.sp,
                     fontWeight: FontWeight.bold,
-                    color: context.isDarkMode ? Colors.white : Colors.black),
+                    color: Colors.white),
               ),
             ],
           ),
@@ -75,7 +75,7 @@ Widget _listOfLikedSongs(context) {
       if (state is FavouriteSongsLoaded) count = state.favouriteSongsIds.length;
       return Text(
         "$count songs",
-        style: TextStyle(fontSize: 16),
+        style: TextStyle(fontSize: 16.sp),
       );
     }),
   );

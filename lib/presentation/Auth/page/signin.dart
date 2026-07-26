@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:spotify/common/appbar/basic_appbar.dart';
-import 'package:spotify/common/helper/is_dark_mode.dart';
 import 'package:spotify/core/config/assets/app_vectors.dart';
+import 'package:spotify/presentation/Auth/page/forgot_password_page.dart';
 import 'package:spotify/presentation/MainWrapper/main_wrapper.dart';
 
 import '../../../common/widget/basic_elevatedbutton.dart';
@@ -13,10 +13,33 @@ import '../../../serviece_locator.dart';
 import 'widgets/google_or_apple_btn.dart';
 import 'widgets/row_text_and_textbtn.dart';
 
-class SigninPage extends StatelessWidget {
-  SigninPage({super.key});
+class SigninPage extends StatefulWidget {
+  final String? prefillEmail;
+  const SigninPage({super.key, this.prefillEmail});
+
+  @override
+  State<SigninPage> createState() => _SigninPageState();
+}
+
+class _SigninPageState extends State<SigninPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _obscurePassword = true;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.prefillEmail != null) {
+      _emailController.text = widget.prefillEmail!;
+    }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,46 +60,42 @@ class SigninPage extends StatelessWidget {
             children: [
               Text(
                 "Sign In",
-                style: TextStyle(fontSize: 30.sp, fontWeight: FontWeight.w600),
+                style:
+                    TextStyle(fontSize: 30.sp, fontWeight: FontWeight.w600),
               ),
-              SizedBox(
-                height: 15.h,
-              ),
+              SizedBox(height: 15.h),
               RowTextAndTextBTN(
                 title: "If you need any support ",
                 clickedTitle: "Click Here",
                 onTap: () {},
               ),
-              SizedBox(
-                height: 26.h,
-              ),
+              SizedBox(height: 26.h),
               _emailTextField(context),
-              SizedBox(
-                height: 28.h,
-              ),
+              SizedBox(height: 28.h),
               _passwordTextField(context),
-              SizedBox(
-                height: 10.h,
-              ),
+              SizedBox(height: 10.h),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ForgotPasswordPage(),
+                          ),
+                        );
+                      },
                       child: Text(
                         "Recovery password",
                         style: TextStyle(
                             fontSize: 16.sp,
                             fontWeight: FontWeight.w500,
-                            color: context.isDarkMode
-                                ? Colors.white
-                                : Colors.black),
+                            color: Colors.white),
                       )),
                 ],
               ),
-              SizedBox(
-                height: 10.h,
-              ),
+              SizedBox(height: 10.h),
               BasicElevatedbutton(
                   title: "Sign In",
                   onPressed: () async {
@@ -85,50 +104,37 @@ class SigninPage extends StatelessWidget {
                       email: _emailController.text.toString(),
                       password: _passwordController.text.toString(),
                     ));
-                    result.fold((l) async {
-                      var snackBar = SnackBar(
-                        content: Text(l),
-                        behavior: SnackBarBehavior.floating,
+                    result.fold((l) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(l)),
                       );
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     }, (r) async {
-                      var snackBar = SnackBar(
-                        content: Text(r),
-                        behavior: SnackBarBehavior.floating,
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(r)),
                       );
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       await Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                            builder: (BuildContext context) => MainWrapper()),
+                            builder: (BuildContext context) =>
+                                MainWrapper()),
                         (route) => false,
                       );
                     });
                   }),
-              SizedBox(
-                height: 31.h,
-              ),
+              SizedBox(height: 31.h),
               const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                    child: Divider(
-                      color: Colors.grey,
-                      thickness: 1,
-                    ),
+                    child: Divider(color: Colors.grey, thickness: 1),
                   ),
                   Text(" Or "),
                   Expanded(
-                    child: Divider(
-                      color: Colors.grey,
-                      thickness: 1,
-                    ),
+                    child: Divider(color: Colors.grey, thickness: 1),
                   ),
                 ],
               ),
-              SizedBox(
-                height: 36.h,
-              ),
+              SizedBox(height: 36.h),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -136,21 +142,17 @@ class SigninPage extends StatelessWidget {
                     svgName: AppVectors.googleLogo,
                     onTap: () {},
                   ),
-                  SizedBox(
-                    width: 58.8.w,
-                  ),
+                  SizedBox(width: 58.8.w),
                   GoogleOrAppleBTN(
                     svgName: AppVectors.appleLogo,
                     onTap: () {},
                   ),
                 ],
               ),
-              SizedBox(
-                height: 40.h,
-              ),
+              SizedBox(height: 40.h),
               RowTextAndTextBTN(
-                title: 'Do you have an account? ',
-                clickedTitle: 'Sign In',
+                title: 'Don\'t have an account? ',
+                clickedTitle: 'Sign Up',
                 onTap: () {},
               ),
             ],
@@ -163,17 +165,31 @@ class SigninPage extends StatelessWidget {
   Widget _emailTextField(BuildContext context) {
     return TextFormField(
       controller: _emailController,
-      decoration: const InputDecoration(hintText: 'Enter Username Or Email')
-          .applyDefaults(Theme.of(context).inputDecorationTheme),
+      decoration: const InputDecoration(
+        hintText: 'Enter Username Or Email',
+        prefixIcon: Icon(Icons.person_outline_rounded),
+      ).applyDefaults(Theme.of(context).inputDecorationTheme),
     );
   }
 
   Widget _passwordTextField(BuildContext context) {
     return TextFormField(
       controller: _passwordController,
-      decoration: const InputDecoration(
-              hintText: 'Password', suffixIcon: Icon(Icons.visibility))
-          .applyDefaults(Theme.of(context).inputDecorationTheme),
+      obscureText: _obscurePassword,
+      decoration: InputDecoration(
+        hintText: 'Password',
+        prefixIcon: const Icon(Icons.lock_outline_rounded),
+        suffixIcon: IconButton(
+          icon: Icon(
+            _obscurePassword
+                ? Icons.visibility_off_rounded
+                : Icons.visibility_rounded,
+          ),
+          onPressed: () {
+            setState(() => _obscurePassword = !_obscurePassword);
+          },
+        ),
+      ).applyDefaults(Theme.of(context).inputDecorationTheme),
     );
   }
 }

@@ -1,8 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 import 'package:spotify/common/backButton/back_button.dart';
 import 'package:spotify/presentation/LikedSongs/cubit/favourite_songs_cubit.dart';
+import 'package:spotify/presentation/LikedSongs/cubit/favourite_songs_state.dart';
 import 'package:spotify/presentation/songsPlayPage/songs_play_page.dart';
 
 class LikedsongsPage extends StatelessWidget {
@@ -44,8 +46,17 @@ class LikedsongsPage extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final song = likedSongs[index];
                   return ListTile(
-                    leading: Image.network(song.imageUrl,
-                        width: 50, height: 50, fit: BoxFit.cover),
+                    leading: ClipRRect(
+                      borderRadius: BorderRadius.circular(4.r),
+                      child: CachedNetworkImage(
+                        imageUrl: song.imageUrl,
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover,
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.music_note),
+                      ),
+                    ),
                     title: Text(song.title,
                         style: TextStyle(
                             fontSize: 16.sp, fontWeight: FontWeight.w500)),

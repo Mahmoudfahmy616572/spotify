@@ -1,8 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:spotify/common/helper/is_dark_mode.dart';
 import 'package:spotify/presentation/songsPlayPage/cubit/song_player_cubit.dart';
+import 'package:spotify/presentation/songsPlayPage/cubit/song_player_state.dart';
 import 'package:spotify/presentation/songsPlayPage/songs_play_page.dart';
 
 class MiniPlayer extends StatelessWidget {
@@ -41,18 +42,21 @@ class MiniPlayer extends StatelessWidget {
             margin: EdgeInsets.symmetric(horizontal: 8.w, vertical: 5.h),
             padding: EdgeInsets.symmetric(horizontal: 10.w),
             decoration: BoxDecoration(
-              color: context.isDarkMode
-                  ? const Color(0xffededed):
-
-                   const Color(0xff282828),
+              color: const Color(0xff282828),
               borderRadius: BorderRadius.circular(8.r),
             ),
             child: Row(
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(5.r),
-                  child: Image.network(song.imageUrl,
-                      width: 45.w, height: 45.h, fit: BoxFit.cover),
+                  child: CachedNetworkImage(
+                    imageUrl: song.imageUrl,
+                    width: 45.w,
+                    height: 45.h,
+                    fit: BoxFit.cover,
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.music_note),
+                  ),
                 ),
                 SizedBox(width: 10.w),
                 SizedBox(width: 10.w),
@@ -60,8 +64,7 @@ class MiniPlayer extends StatelessWidget {
                   child: Text(
                     "${song.title} - ${song.artist}",
                     style: TextStyle(
-                        color:
-                            context.isDarkMode ? Colors.black : Colors.white),
+                        color: Colors.white),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -70,7 +73,7 @@ class MiniPlayer extends StatelessWidget {
                       cubit.audioPlayer.playing
                           ? Icons.pause
                           : Icons.play_arrow,
-                      color: context.isDarkMode ? Colors.black : Colors.white),
+                      color: Colors.white),
                   onPressed: () => cubit.playOrpauseSong(),
                 ),
               ],

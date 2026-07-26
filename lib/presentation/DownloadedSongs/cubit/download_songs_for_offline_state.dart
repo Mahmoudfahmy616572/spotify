@@ -1,7 +1,9 @@
-part of 'download_songs_for_offline_cubit.dart';
+import 'package:equatable/equatable.dart';
 
-@immutable
-abstract class DownloadSongsForOfflineState {}
+abstract class DownloadSongsForOfflineState extends Equatable {
+  @override
+  List<Object?> get props => [];
+}
 
 class DownloadSongsForOfflineLoading extends DownloadSongsForOfflineState {}
 
@@ -16,6 +18,9 @@ class DownloadSongsForOfflineLoaded extends DownloadSongsForOfflineState {
         completedIds: completedIds ?? this.completedIds,
         downloads: downloads ?? this.downloads);
   }
+
+  @override
+  List<Object?> get props => [downloads, completedIds];
 }
 
 class DownloadSongsForOfflineFailure extends DownloadSongsForOfflineState {}

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:spotify/common/helper/is_dark_mode.dart';
 import 'package:spotify/data/models/songs/songs_model.dart';
 import 'package:spotify/presentation/Home/cubit/get_songs_cubit.dart';
 import 'package:spotify/presentation/LikedSongs/cubit/favourite_songs_cubit.dart';
+import 'package:spotify/presentation/LikedSongs/cubit/favourite_songs_state.dart';
 
 import '../../../core/config/assets/app_vectors.dart';
 import '../../songsPlayPage/songs_play_page.dart';
@@ -25,7 +25,7 @@ class GetPlayList extends StatelessWidget {
           }
           if (state is GetSongsLoaded) {
             return Padding(
-              padding: EdgeInsets.all(20.h),
+              padding: EdgeInsets.all(20.r),
               child: Column(
                 children: [
                   Row(
@@ -35,19 +35,15 @@ class GetPlayList extends StatelessWidget {
                         "Playlist",
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 22.h,
-                            color: context.isDarkMode
-                                ? const Color(0xFFDBDBDB)
-                                : const Color(0xFF131313)),
+                            fontSize: 22.sp,
+                            color: const Color(0xFFDBDBDB)),
                       ),
                       Text(
                         "see more",
                         style: TextStyle(
                             fontWeight: FontWeight.normal,
-                            fontSize: 12.h,
-                            color: context.isDarkMode
-                                ? const Color(0xFFC6C6C6)
-                                : const Color(0xFF131313)),
+                            fontSize: 12.sp,
+                            color: const Color(0xFFC6C6C6)),
                       ),
                     ],
                   ),
@@ -62,7 +58,7 @@ class GetPlayList extends StatelessWidget {
               children: [
                 Icon(
                   Icons.music_note_sharp,
-                  size: 30.h,
+                  size: 30.r,
                 ),
                 Text(state.errorMessage),
               ],
@@ -99,9 +95,7 @@ class GetPlayList extends StatelessWidget {
                         height: 35.h,
                         decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: context.isDarkMode
-                                ? const Color(0xff959595)
-                                : const Color(0xFFE6E6E6)),
+                            color: const Color(0xff959595)),
                         child: Padding(
                           padding: EdgeInsets.all(8.0.w),
                           child: SvgPicture.asset(
@@ -119,10 +113,8 @@ class GetPlayList extends StatelessWidget {
                             songs[index].title,
                             style: TextStyle(
                                 fontWeight: FontWeight.w700,
-                                fontSize: 17.h,
-                                color: context.isDarkMode
-                                    ? const Color(0xFFD6D6D6)
-                                    : const Color(0xFF000000)),
+                                fontSize: 17.sp,
+                                color: const Color(0xFFD6D6D6)),
                             textAlign: TextAlign.center,
                           ),
                           SizedBox(
@@ -131,10 +123,8 @@ class GetPlayList extends StatelessWidget {
                           Text(
                             songs[index].artist,
                             style: TextStyle(
-                                fontSize: 15.h,
-                                color: context.isDarkMode
-                                    ? const Color(0xFFD6D6D6)
-                                    : const Color(0xFF000000)),
+                                fontSize: 15.sp,
+                                color: const Color(0xFFD6D6D6)),
                             textAlign: TextAlign.center,
                           ),
                         ],
@@ -147,13 +137,11 @@ class GetPlayList extends StatelessWidget {
                     Text(
                       songs[index].duration.replaceAll(".", ":"),
                       style: TextStyle(
-                          color: context.isDarkMode
-                              ? const Color(0xff959595)
-                              : const Color(0xFF000000)),
+                          color: const Color(0xff959595)),
                       textAlign: TextAlign.center,
                     ),
                     SizedBox(
-                      width: 40.h,
+                      width: 40.w,
                     ),
                     BlocBuilder<FavouriteSongsCubit, FavouriteSongsState>(
                       builder: (context, state) {
@@ -171,9 +159,7 @@ class GetPlayList extends StatelessWidget {
                             isFavourite
                                 ? Icons.favorite
                                 : Icons.favorite_border,
-                            color: context.isDarkMode
-                                ? Colors.white
-                                : Colors.black,
+                            color: Colors.white,
                           ),
                         );
                       },
@@ -183,7 +169,7 @@ class GetPlayList extends StatelessWidget {
               ],
             ),
         separatorBuilder: (context, index) => SizedBox(
-              height: 34.w,
+              height: 34.h,
             ),
         itemCount: songs.length);
   }

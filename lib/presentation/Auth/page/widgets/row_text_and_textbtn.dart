@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:spotify/common/helper/is_dark_mode.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class RowTextAndTextBTN extends StatelessWidget {
   const RowTextAndTextBTN({
@@ -20,10 +20,8 @@ class RowTextAndTextBTN extends StatelessWidget {
         Text(
           title,
           style: TextStyle(
-              fontSize: 14,
-              color: context.isDarkMode
-                  ? const Color(0xffE1E1E1)
-                  : const Color(0xff383838),
+              fontSize: 14.sp,
+              color: const Color(0xffE1E1E1),
               fontWeight: FontWeight.normal),
         ),
         GestureDetector(
@@ -31,7 +29,7 @@ class RowTextAndTextBTN extends StatelessWidget {
           child: Text(
             clickedTitle,
             style: TextStyle(
-                fontSize: 14,
+                fontSize: 14.sp,
                 color: Color(0xff38B432),
                 fontWeight: FontWeight.normal),
           ),

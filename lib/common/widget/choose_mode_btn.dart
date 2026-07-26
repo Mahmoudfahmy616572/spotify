@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class ChooseModeBtn extends StatelessWidget {
@@ -23,8 +24,8 @@ class ChooseModeBtn extends StatelessWidget {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
               child: Container(
-                height: 73,
-                width: 73,
+                height: 73.h,
+                width: 73.w,
                 decoration: BoxDecoration(
                     color: const Color(0xff30393c).withOpacity(0.5),
                     shape: BoxShape.circle),
@@ -37,13 +38,13 @@ class ChooseModeBtn extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(
-          height: 17,
+        SizedBox(
+          height: 17.h,
         ),
         Text(
           modeTitle,
-          style: const TextStyle(
-              color: Colors.white, fontSize: 17, fontWeight: FontWeight.w500),
+          style: TextStyle(
+              color: Colors.white, fontSize: 17.sp, fontWeight: FontWeight.w500),
         )
       ],
     );

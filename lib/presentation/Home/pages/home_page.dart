@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:spotify/common/appbar/basic_appbar.dart';
-import 'package:spotify/common/helper/is_dark_mode.dart';
 import 'package:spotify/presentation/Home/widgets/new_songs.dart';
+import 'package:spotify/presentation/Home/widgets/recently_played_widget.dart';
+import 'package:spotify/presentation/Profile/profile_page.dart';
 
 import '../../../core/config/assets/app_images.dart';
 import '../../../core/config/assets/app_vectors.dart';
@@ -19,10 +20,23 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final GlobalKey<RefreshIndicatorState> _refreshKey =
+      GlobalKey<RefreshIndicatorState>();
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _onRefresh() async {
+    await Future.delayed(const Duration(milliseconds: 800));
   }
 
   @override
@@ -36,9 +50,24 @@ class _HomePageState extends State<HomePage>
             height: 33.h,
             fit: BoxFit.fill,
           ),
+          actions: IconButton(
+            icon: Icon(
+              Icons.person,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ProfilePage()),
+              );
+            },
+          ),
         ),
-        body: Builder(builder: (context) {
-          return SingleChildScrollView(
+        body: RefreshIndicator(
+          key: _refreshKey,
+          onRefresh: _onRefresh,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
             child: Column(
               children: [
                 _topHomeCard(),
@@ -58,11 +87,15 @@ class _HomePageState extends State<HomePage>
                 SizedBox(
                   height: 20.h,
                 ),
+                const RecentlyPlayedWidget(),
+                SizedBox(
+                  height: 20.h,
+                ),
                 SizedBox(height: 500.h, child: const GetPlayList())
               ],
             ),
-          );
-        }));
+          ),
+        ));
   }
 
   Widget _tabs() {
@@ -72,23 +105,23 @@ class _HomePageState extends State<HomePage>
         dividerColor: Colors.transparent,
         isScrollable: true,
         unselectedLabelColor: Colors.grey,
-        labelColor: context.isDarkMode ? Colors.white : Colors.black,
-        tabs: const [
+        labelColor: Colors.white,
+        tabs: [
           Text(
             "News",
-            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18.sp),
           ),
           Text(
-            "Vedio",
-            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+            "Video",
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18.sp),
           ),
           Text(
             "Artists",
-            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18.sp),
           ),
           Text(
             "Podcast",
-            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18.sp),
           ),
         ]);
   }
@@ -102,7 +135,7 @@ class _HomePageState extends State<HomePage>
               alignment: Alignment.bottomCenter,
               child: SvgPicture.asset(AppVectors.topHomeCard)),
           Padding(
-            padding: const EdgeInsets.only(right: 50),
+            padding: EdgeInsets.only(right: 50.w),
             child: Align(
                 alignment: Alignment.bottomRight,
                 child: Image.asset(AppImages.topHomeImage)),

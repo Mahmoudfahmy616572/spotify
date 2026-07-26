@@ -1,3 +1,3 @@
-abstract class Usecase<type, Param> {
-  Future<type> call({Param? param});
-}
+// This file is kept for backward compatibility.
+// The canonical Usecase is in lib/domain/usecase/usecase.dart
+export 'package:spotify/domain/usecase/usecase.dart';

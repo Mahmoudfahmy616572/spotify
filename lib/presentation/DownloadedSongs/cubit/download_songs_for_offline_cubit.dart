@@ -1,11 +1,10 @@
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:hive/hive.dart';
-import 'package:meta/meta.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:spotify/data/models/songs/songs_model.dart';
 
-part 'download_songs_for_offline_state.dart';
+import 'download_songs_for_offline_state.dart';
 
 class DownloadSongsForOfflineCubit extends Cubit<DownloadSongsForOfflineState> {
   DownloadSongsForOfflineCubit()
@@ -53,7 +52,7 @@ class DownloadSongsForOfflineCubit extends Cubit<DownloadSongsForOfflineState> {
             downloads: newDownloads, completedIds: newCompletedIds));
       }
     } catch (e) {
-      print("Downloaded failed: $e");
+      emit(DownloadSongsForOfflineFailure());
     }
   }
 }

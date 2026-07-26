@@ -17,7 +17,7 @@ class DownloadedsongsPage extends StatelessWidget {
             children: [
               Text(
                 "Downloaded Songs",
-                style: TextStyle(fontSize: 27, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 27.sp, fontWeight: FontWeight.bold),
               ),
             ],
           ),

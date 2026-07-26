@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart' show BlocBuilder, ReadContext;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:spotify/common/helper/is_dark_mode.dart';
 import 'package:spotify/presentation/Home/pages/home_page.dart';
 import 'package:spotify/presentation/Home/widgets/miniPlayerBar/mini_player.dart';
 import 'package:spotify/presentation/Library/library_page.dart';
@@ -12,14 +11,15 @@ import 'package:spotify/presentation/MainWrapper/cubit/cubit/navigation_cubit.da
 import '../SearchPage/search_page.dart';
 
 class MainWrapper extends StatelessWidget {
-  MainWrapper({super.key});
-  List<Widget> screens = [
-    HomePage(),
-    SearchPage(),
-    LibraryPage(),
-  ];
+  const MainWrapper({super.key});
+
   @override
   Widget build(BuildContext context) {
+    final List<Widget> screens = [
+      const HomePage(),
+      const SearchPage(),
+      const LibraryPage(),
+    ];
     return BlocBuilder<NavigationCubit, int>(
       builder: (context, currentIndex) {
         return Scaffold(
@@ -49,9 +49,7 @@ class MainWrapper extends StatelessWidget {
                 backgroundColor: Colors.transparent,
                 elevation: 0,
                 selectedItemColor: const Color(0xff42C83C), // Spotify Green
-                unselectedItemColor: context.isDarkMode
-                    ? Colors.white.withOpacity(0.7)
-                    : Colors.black.withOpacity(0.7),
+                unselectedItemColor: Colors.white.withOpacity(0.7),
                 items: const [
                   BottomNavigationBarItem(
                       icon: Icon(Icons.home), label: 'Home'),

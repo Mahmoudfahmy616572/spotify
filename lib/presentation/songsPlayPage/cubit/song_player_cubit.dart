@@ -4,18 +4,17 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/painting.dart';
 import 'package:hive/hive.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:meta/meta.dart';
 import 'package:palette_generator/palette_generator.dart';
 import 'package:spotify/data/models/songs/songs_model.dart';
 
-part 'song_player_state.dart';
+import 'song_player_state.dart';
 
 class SongPlayerCubit extends Cubit<SongPlayerState> {
   bool _isShuffleMode = false;
   bool get isShuffleMode => _isShuffleMode;
   LoopMode _loopMode = LoopMode.off;
   LoopMode get loopMode => _loopMode;
-  bool _isLyricsVisable = false;
+  bool _isLyricsVisible = false;
   Color dominantColor = const Color(0xff121212);
   final AudioPlayer audioPlayer = AudioPlayer();
   List<SongModel> playList = [];
@@ -23,7 +22,8 @@ class SongPlayerCubit extends Cubit<SongPlayerState> {
   String url = '';
   Duration songDuration = Duration.zero;
   Duration songPosition = Duration.zero;
-  SongPlayerCubit() : super(SongPlayerLoading()) {
+  Function(SongModel)? onSongPlayed;
+  SongPlayerCubit() : super(const SongPlayerLoaded(isLyricsVisible: false)) {
     audioPlayer.durationStream.listen((duration) async {
       if (duration != null) {
         songDuration = duration;
@@ -42,15 +42,22 @@ class SongPlayerCubit extends Cubit<SongPlayerState> {
   }
   void toggleShowLyrics() {
     if (state is SongPlayerLoaded) {
-      _isLyricsVisable = !_isLyricsVisable;
+      _isLyricsVisible = !_isLyricsVisible;
       emit((state as SongPlayerLoaded).copyWith(
-        isLyricsVisible: _isLyricsVisable,
+        isLyricsVisible: _isLyricsVisible,
       ));
     }
   }
 
   void updateSongPlayer() {
-    if (!isClosed) emit(SongPlayerLoaded(isLyricsVisable: _isLyricsVisable));
+    if (!isClosed) {
+      emit(SongPlayerLoaded(isLyricsVisible: _isLyricsVisible));
+    }
+  }
+
+  void updatePlaylist(List<SongModel> newPlaylist) {
+    playList = newPlaylist;
+    updateSongPlayer();
   }
 
   void toggleShuffleMode() async {
@@ -94,22 +101,21 @@ class SongPlayerCubit extends Cubit<SongPlayerState> {
       List<SongModel> songs, int index, String urlImage) async {
     playList = songs;
     currentIndex = index;
-    urlImage = url;
+    url = urlImage;
     upDateThemeColor(songs[index].imageUrl);
+    onSongPlayed?.call(songs[index]);
 
     try {
-      emit(SongPlayerLoading());
+      emit(const SongPlayerLoaded(isLyricsVisible: false));
       final box = Hive.box('offline_songs');
       final String? localPath = box.get(playList[currentIndex].id.toString());
       if (localPath != null && await File(localPath).exists()) {
-        //(offline)
         await audioPlayer.setFilePath(localPath);
       } else {
-        //(online)
         await audioPlayer.setUrl(songs[currentIndex].urlSongsbase);
       }
       audioPlayer.play();
-      emit(SongPlayerLoaded(isLyricsVisable: _isLyricsVisable));
+      emit(SongPlayerLoaded(isLyricsVisible: _isLyricsVisible));
     } catch (e) {
       emit(SongPlayerFailure(errorMessage: 'Failed to load song: $e'));
     }
@@ -144,7 +150,7 @@ class SongPlayerCubit extends Cubit<SongPlayerState> {
     } else {
       await audioPlayer.play();
     }
-    emit(SongPlayerLoaded(isLyricsVisable: _isLyricsVisable));
+    emit(SongPlayerLoaded(isLyricsVisible: _isLyricsVisible));
   }
 
   @override

@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 120" fill="none">
+  <defs>
+    <linearGradient id="g1" x1="50" y1="10" x2="110" y2="110" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#D8B4FE"/>
+      <stop offset="35%" stop-color="#A855F7"/>
+      <stop offset="70%" stop-color="#7B2FBE"/>
+      <stop offset="100%" stop-color="#4C1D95"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- The bold S — clean bezier curves -->
+  <path d="M105 12 C75 12,45 24,45 42 C45 60,75 66,105 70 C135 74,165 78,165 92 C165 108,135 115,105 115" 
+        stroke="url(#g1)" stroke-width="16" fill="none" stroke-linecap="round" filter="url(#glow)"/>
+
+  <!-- Sound wave arc — left -->
+  <path d="M28 44 C16 44,6 54,6 62 C6 72,16 80,28 80" 
+        stroke="url(#g1)" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.8"/>
+
+  <!-- Sound wave arc — right -->
+  <path d="M182 44 C194 44,204 54,204 62 C204 72,194 80,182 80" 
+        stroke="url(#g1)" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.8"/>
+
+  <!-- Text: oundOra — thin for ound/ra, bold for O -->
+  <text x="218" y="68" font-family="'Helvetica Neue', Arial, sans-serif" font-size="24" font-weight="300" 
+        fill="#A855F7" letter-spacing="3">ound</text>
+  <text x="278" y="68" font-family="'Helvetica Neue', Arial, sans-serif" font-size="30" font-weight="800" 
+        fill="url(#g1)">O</text>
+  <text x="303" y="68" font-family="'Helvetica Neue', Arial, sans-serif" font-size="24" font-weight="300" 
+        fill="#A855F7" letter-spacing="3">ra</text>
+</svg>

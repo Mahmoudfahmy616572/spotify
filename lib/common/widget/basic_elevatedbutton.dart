@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class BasicElevatedbutton extends StatelessWidget {
   const BasicElevatedbutton({
@@ -15,7 +16,7 @@ class BasicElevatedbutton extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style:
-          ElevatedButton.styleFrom(minimumSize: Size.fromHeight(height ?? 80)),
+          ElevatedButton.styleFrom(minimumSize: Size.fromHeight(height ?? 80.h)),
       child: Text(
         title,
         style: const TextStyle(color: Colors.white),

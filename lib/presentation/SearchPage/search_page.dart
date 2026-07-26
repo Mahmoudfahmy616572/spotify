@@ -1,13 +1,13 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart'
     show BlocBuilder, BlocProvider, ReadContext;
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
-import 'package:spotify/common/helper/is_dark_mode.dart';
 import 'package:spotify/data/models/songs/songs_model.dart';
 import 'package:spotify/presentation/SearchPage/cubit/cubit/search_songs_cubit.dart';
-import 'package:spotify/presentation/songsPlayPage/cubit/song_player_cubit.dart';
+import 'package:spotify/presentation/SearchPage/cubit/cubit/search_songs_state.dart';
 import 'package:spotify/presentation/songsPlayPage/songs_play_page.dart';
 
 class SearchPage extends StatelessWidget {
@@ -36,8 +36,7 @@ class SearchPage extends StatelessWidget {
                     style: TextStyle(
                         fontSize: 30.sp,
                         fontWeight: FontWeight.bold,
-                        color:
-                            context.isDarkMode ? Colors.white : Colors.black),
+                        color: Colors.white),
                   ),
                 ],
               ),
@@ -59,12 +58,18 @@ class SearchPage extends StatelessWidget {
                   decoration: InputDecoration(
                     hintText: "what do you want to listen to ?",
                     prefixIcon: const Icon(Icons.search),
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.clear),
+                      onPressed: () {
+                        searchcontext.read<SearchSongsCubit>().searchSongs('');
+                      },
+                    ),
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.r),
                         borderSide: BorderSide.none),
                     filled: true,
                     fillColor:
-                        context.isDarkMode ? Colors.white10 : Colors.black12,
+                        Colors.white10,
                   ),
                 );
               }),
@@ -100,11 +105,12 @@ Widget _searchResults(List<SongModel> songs) {
         return ListTile(
           leading: ClipRRect(
             borderRadius: BorderRadius.circular(8.r),
-            child: Image.network(
-              song.imageUrl,
+            child: CachedNetworkImage(
+              imageUrl: song.imageUrl,
               width: 50.w,
               height: 50.h,
               fit: BoxFit.cover,
+              errorWidget: (context, url, error) => const Icon(Icons.music_note),
             ),
           ),
           title: Text(
@@ -130,10 +136,10 @@ Widget _searchResults(List<SongModel> songs) {
 Widget _buildBrowseAll() {
   return GridView.builder(
     padding: EdgeInsets.only(top: 20.h),
-    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
       crossAxisCount: 2,
-      crossAxisSpacing: 10,
-      mainAxisSpacing: 10,
+      crossAxisSpacing: 10.w,
+      mainAxisSpacing: 10.h,
       childAspectRatio: 1.6,
     ),
     itemCount: 8,
@@ -141,8 +147,8 @@ Widget _buildBrowseAll() {
       decoration: BoxDecoration(
           color: Colors.primaries[index % Colors.primaries.length],
           borderRadius: BorderRadius.circular(8.r)),
-      padding: const EdgeInsets.all(12),
-      child: const Text("Genre Name",
+      padding: EdgeInsets.all(12.r),
+      child: Text("Genre Name",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
     ),
   );

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:spotify/common/helper/is_dark_mode.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 IconButton backButton(BuildContext context) {
   return IconButton(
@@ -7,17 +7,15 @@ IconButton backButton(BuildContext context) {
       Navigator.pop(context);
     },
     icon: Container(
-        height: 30,
-        width: 30,
+        height: 30.h,
+        width: 30.w,
         decoration: BoxDecoration(
-            color: context.isDarkMode
-                ? Colors.white.withOpacity(0.3)
-                : const Color(0xff414141).withOpacity(0.2),
+            color: Colors.white.withOpacity(0.3),
             shape: BoxShape.circle),
         child: Icon(
           Icons.arrow_back_ios_new,
-          size: 15,
-          color: context.isDarkMode ? Colors.white : Colors.black,
+          size: 15.sp,
+          color: Colors.white,
         )),
   );
 }

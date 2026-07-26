@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 
 class GoogleOrAppleBTN extends StatelessWidget {
@@ -16,8 +17,8 @@ class GoogleOrAppleBTN extends StatelessWidget {
       onTap: onTap,
       child: SvgPicture.asset(
         svgName,
-        height: 30,
-        width: 37,
+        height: 30.h,
+        width: 37.w,
       ),
     );
   }
