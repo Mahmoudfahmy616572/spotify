@@ -4,7 +4,7 @@ import 'package:spotify/data/models/songs/songs_model.dart';
 import 'models/deezer_track_model.dart';
 
 abstract class DeezerDataSource {
-  Future<List<SongModel>> searchTracks(String query);
+  Future<List<SongModel>> searchTracks(String query, {int offset = 0, int limit = 20});
   Future<List<SongModel>> getTopTracks({String country = 'eg', int limit = 25});
   Future<List<SongModel>> getEditorialTracks({int limit = 25});
   Future<List<SongModel>> getNewReleases({String country = 'eg', int limit = 25});
@@ -31,35 +31,59 @@ class DeezerDataSourceImpl implements DeezerDataSource {
   }
 
   @override
-  Future<List<SongModel>> searchTracks(String query) async {
-    final response = await _dio.get('/search', queryParameters: {'q': query, 'limit': 30});
-    return _parseTracks(response.data);
+  Future<List<SongModel>> searchTracks(String query, {int offset = 0, int limit = 20}) async {
+    try {
+      final response = await _dio.get('/search', queryParameters: {
+        'q': query,
+        'limit': limit,
+        'index': offset,
+      });
+      return _parseTracks(response.data);
+    } on DioException {
+      return [];
+    }
   }
 
   @override
   Future<List<SongModel>> getTopTracks({String country = 'eg', int limit = 25}) async {
-    final response = await _dio.get('/chart/$country/tracks', queryParameters: {'limit': limit});
-    return _parseTracks(response.data);
+    try {
+      final response = await _dio.get('/chart/$country/tracks', queryParameters: {'limit': limit});
+      return _parseTracks(response.data);
+    } on DioException {
+      return [];
+    }
   }
 
   @override
   Future<List<SongModel>> getEditorialTracks({int limit = 25}) async {
-    final response = await _dio.get('/editorial/0/tracks', queryParameters: {'limit': limit});
-    return _parseTracks(response.data);
+    try {
+      final response = await _dio.get('/editorial/0/tracks', queryParameters: {'limit': limit});
+      return _parseTracks(response.data);
+    } on DioException {
+      return [];
+    }
   }
 
   @override
   Future<List<SongModel>> getNewReleases({String country = 'eg', int limit = 25}) async {
-    final response = await _dio.get('/chart/$country', queryParameters: {'limit': limit});
-    final chartData = response.data as Map<String, dynamic>;
-    final tracksData = chartData['tracks'] as Map<String, dynamic>? ?? {};
-    return _parseTracks(tracksData);
+    try {
+      final response = await _dio.get('/chart/$country', queryParameters: {'limit': limit});
+      final chartData = response.data as Map<String, dynamic>;
+      final tracksData = chartData['tracks'] as Map<String, dynamic>? ?? {};
+      return _parseTracks(tracksData);
+    } on DioException {
+      return [];
+    }
   }
 
   @override
   Future<SongModel?> getTrack(int id) async {
-    final response = await _dio.get('/track/$id');
-    final track = DeezerTrackModel.fromJson(response.data as Map<String, dynamic>);
-    return track.toSongModel();
+    try {
+      final response = await _dio.get('/track/$id');
+      final track = DeezerTrackModel.fromJson(response.data as Map<String, dynamic>);
+      return track.toSongModel();
+    } on DioException {
+      return null;
+    }
   }
 }

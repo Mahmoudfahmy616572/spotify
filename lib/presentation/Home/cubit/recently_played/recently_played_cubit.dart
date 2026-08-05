@@ -15,36 +15,50 @@ class RecentlyPlayedCubit extends Cubit<RecentlyPlayedState> {
   }
 
   Future<void> _loadRecentlyPlayed() async {
-    final box = await Hive.openBox(_boxName);
-    final songsJson = box.get('songs', defaultValue: <String>[]) as List;
-    final songs = songsJson
-        .map((e) => SongModel.fromJson(jsonDecode(e.toString())))
-        .toList();
-    emit(RecentlyPlayedLoaded(songs));
+    try {
+      final box = await Hive.openBox(_boxName);
+      final songsJson = box.get('songs', defaultValue: <String>[]) as List;
+      final songs = <SongModel>[];
+      for (final e in songsJson) {
+        try {
+          songs.add(SongModel.fromJson(jsonDecode(e.toString())));
+        } catch (_) {}
+      }
+      emit(RecentlyPlayedLoaded(songs));
+    } catch (_) {
+      emit(RecentlyPlayedLoaded([]));
+    }
   }
 
   Future<void> addSong(SongModel song) async {
-    final box = await Hive.openBox(_boxName);
-    final songsJson = box.get('songs', defaultValue: <String>[]) as List;
-    final songs = songsJson
-        .map((e) => SongModel.fromJson(jsonDecode(e.toString())))
-        .toList();
+    try {
+      final box = await Hive.openBox(_boxName);
+      final songsJson = box.get('songs', defaultValue: <String>[]) as List;
+      final songs = <SongModel>[];
+      for (final e in songsJson) {
+        try {
+          songs.add(SongModel.fromJson(jsonDecode(e.toString())));
+        } catch (_) {}
+      }
 
-    songs.removeWhere((s) => s.id == song.id);
-    songs.insert(0, song);
+      songs.removeWhere((s) => s.id == song.id);
+      songs.insert(0, song);
 
-    if (songs.length > _maxItems) {
-      songs.removeRange(_maxItems, songs.length);
-    }
+      if (songs.length > _maxItems) {
+        songs.removeRange(_maxItems, songs.length);
+      }
 
-    final encoded = songs.map((s) => jsonEncode(s.toJson())).toList();
-    await box.put('songs', encoded);
-    emit(RecentlyPlayedLoaded(songs));
+      final encoded = songs.map((s) => jsonEncode(s.toJson())).toList();
+      await box.put('songs', encoded);
+      emit(RecentlyPlayedLoaded(songs));
+    } catch (_) {}
   }
 
   Future<void> clearRecentlyPlayed() async {
-    final box = await Hive.openBox(_boxName);
-    await box.put('songs', <String>[]);
-    emit(RecentlyPlayedLoaded([]));
+    try {
+      final box = await Hive.openBox(_boxName);
+      await box.put('songs', <String>[]);
+      emit(RecentlyPlayedLoaded([]));
+    } catch (_) {}
   }
 }

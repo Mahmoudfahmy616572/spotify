@@ -4,23 +4,43 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:spotify/core/config/assets/app_vectors.dart';
+import 'package:spotify/core/widgets/shimmer_widgets.dart';
 import 'package:spotify/presentation/Home/cubit/get_songs_cubit.dart';
 import 'package:spotify/presentation/Home/cubit/get_songs_state.dart';
 import 'package:spotify/presentation/songsPlayPage/songs_play_page.dart';
 
 import '../../../data/models/songs/songs_model.dart';
 
-class NewSongs extends StatelessWidget {
+class NewSongs extends StatefulWidget {
   const NewSongs({super.key});
 
   @override
+  State<NewSongs> createState() => _NewSongsState();
+}
+
+class _NewSongsState extends State<NewSongs> {
+  late final GetSongsCubit _cubit;
+
+  @override
+  void initState() {
+    super.initState();
+    _cubit = GetSongsCubit()..fetchSongs();
+  }
+
+  @override
+  void dispose() {
+    _cubit.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-        create: (_) => GetSongsCubit()..fetchSongs(),
+    return BlocProvider.value(
+        value: _cubit,
         child: BlocBuilder<GetSongsCubit, GetSongsState>(
             builder: (context, state) {
           if (state is GetSongsLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const HorizontalCardShimmer(cardWidth: 147, cardHeight: 185);
           }
           if (state is GetSongsLoaded) {
             final songs = state.songs;
@@ -74,12 +94,10 @@ class NewSongs extends StatelessWidget {
                             fit: BoxFit.cover,
                             errorWidget: (context, url, error) =>
                                 const Icon(Icons.music_note),
-                            placeholder: (context, url) => Container(
+                            placeholder: (context, url) => ShimmerWidget(
                               height: 150.h,
                               width: 160.w,
-                              color: Colors.grey[300],
-                              child: const Center(
-                                  child: CircularProgressIndicator()),
+                              borderRadius: 30,
                             ),
                           ),
                         ),

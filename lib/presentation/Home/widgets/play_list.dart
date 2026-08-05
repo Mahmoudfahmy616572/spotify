@@ -1,27 +1,46 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:spotify/core/widgets/shimmer_widgets.dart';
 import 'package:spotify/data/models/songs/songs_model.dart';
 import 'package:spotify/presentation/Home/cubit/get_songs_cubit.dart';
 import 'package:spotify/presentation/LikedSongs/cubit/favourite_songs_cubit.dart';
 import 'package:spotify/presentation/LikedSongs/cubit/favourite_songs_state.dart';
 
-import '../../../core/config/assets/app_vectors.dart';
 import '../../songsPlayPage/songs_play_page.dart';
 import '../cubit/get_songs_state.dart';
 
-class GetPlayList extends StatelessWidget {
+class GetPlayList extends StatefulWidget {
   const GetPlayList({super.key});
 
   @override
+  State<GetPlayList> createState() => _GetPlayListState();
+}
+
+class _GetPlayListState extends State<GetPlayList> {
+  late final GetSongsCubit _cubit;
+
+  @override
+  void initState() {
+    super.initState();
+    _cubit = GetSongsCubit()..fetchSongs();
+  }
+
+  @override
+  void dispose() {
+    _cubit.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => GetSongsCubit()..fetchSongs(),
+    return BlocProvider.value(
+      value: _cubit,
       child: BlocBuilder<GetSongsCubit, GetSongsState>(
         builder: (context, state) {
           if (state is GetSongsLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: SongListShimmer());
           }
           if (state is GetSongsLoaded) {
             return Padding(
@@ -73,104 +92,105 @@ class GetPlayList extends StatelessWidget {
   Widget _playlist(List<SongModel> songs, BuildContext context) {
     return ListView.separated(
         shrinkWrap: true,
-        itemBuilder: (context, index) => Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        itemBuilder: (context, index) {
+          final song = songs[index];
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SongsPlayPage(
+                    songs: songs,
+                    index: index,
+                    songModel: song,
+                  ),
+                ),
+              );
+            },
+            child: Row(
               children: [
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => SongsPlayPage(
-                                  songs: songs,
-                                  index: index,
-                                  songModel: songs[index],
-                                )));
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8.r),
+                  child: Stack(
+                    alignment: Alignment.center,
                     children: [
-                      Container(
-                        width: 35.w,
-                        height: 35.h,
-                        decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: const Color(0xff959595)),
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0.w),
-                          child: SvgPicture.asset(
-                            AppVectors.playMusicIcon,
-                          ),
+                      CachedNetworkImage(
+                        imageUrl: song.imageUrl,
+                        width: 56.w,
+                        height: 56.h,
+                        fit: BoxFit.cover,
+                        errorWidget: (_, __, ___) => Container(
+                          width: 56.w,
+                          height: 56.h,
+                          color: Colors.grey[800],
+                          child: const Icon(Icons.music_note, color: Colors.white54),
                         ),
                       ),
-                      SizedBox(
-                        width: 23.w,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            songs[index].title,
-                            style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 17.sp,
-                                color: const Color(0xFFD6D6D6)),
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(
-                            height: 5.h,
-                          ),
-                          Text(
-                            songs[index].artist,
-                            style: TextStyle(
-                                fontSize: 15.sp,
-                                color: const Color(0xFFD6D6D6)),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
+                      Container(
+                        width: 30.w,
+                        height: 30.h,
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.5),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.play_arrow_rounded,
+                          color: Colors.white,
+                          size: 18.sp,
+                        ),
                       ),
                     ],
                   ),
                 ),
-                Row(
-                  children: [
-                    Text(
-                      songs[index].duration.replaceAll(".", ":"),
-                      style: TextStyle(
-                          color: const Color(0xff959595)),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(
-                      width: 40.w,
-                    ),
-                    BlocBuilder<FavouriteSongsCubit, FavouriteSongsState>(
-                      builder: (context, state) {
-                        final song = songs[index];
-                        bool isFavourite = context
-                            .watch<FavouriteSongsCubit>()
-                            .isFavourite(song.id);
-                        return IconButton(
-                          onPressed: () {
-                            context
-                                .read<FavouriteSongsCubit>()
-                                .toggleFavourite(song);
-                          },
-                          icon: Icon(
-                            isFavourite
-                                ? Icons.favorite
-                                : Icons.favorite_border,
-                            color: Colors.white,
-                          ),
-                        );
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        song.title,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 15.sp,
+                          color: const Color(0xFFD6D6D6),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: 4.h),
+                      Text(
+                        song.artist,
+                        style: TextStyle(
+                          fontSize: 13.sp,
+                          color: const Color(0xFF969696),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                BlocBuilder<FavouriteSongsCubit, FavouriteSongsState>(
+                  builder: (context, state) {
+                    bool isFavourite =
+                        context.watch<FavouriteSongsCubit>().isFavourite(song.id);
+                    return IconButton(
+                      onPressed: () {
+                        context.read<FavouriteSongsCubit>().toggleFavourite(song);
                       },
-                    ),
-                  ],
-                )
+                      icon: Icon(
+                        isFavourite ? Icons.favorite : Icons.favorite_border,
+                        color: isFavourite ? Colors.green : Colors.grey,
+                        size: 20.sp,
+                      ),
+                    );
+                  },
+                ),
               ],
             ),
-        separatorBuilder: (context, index) => SizedBox(
-              height: 34.h,
-            ),
+          );
+        },
+        separatorBuilder: (context, index) => SizedBox(height: 12.h),
         itemCount: songs.length);
   }
 }

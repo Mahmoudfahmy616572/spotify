@@ -113,6 +113,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       username: _usernameController.text.toString(),
                     ),
                   );
+                  if (!mounted) return;
                   result.fold((l) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text(l)),

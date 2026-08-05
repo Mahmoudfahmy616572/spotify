@@ -1,14 +1,21 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter/foundation.dart';
 import 'package:spotify/data/models/songs/songs_model.dart';
+import 'package:spotify/data/sources/favourites/favourite_songs_data_source.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'favourite_songs_state.dart';
 
 class FavouriteSongsCubit extends Cubit<FavouriteSongsState> {
+  final FavouriteSongsDataSource _dataSource;
   final SupabaseClient _supabase = Supabase.instance.client;
   Set<String> _favouriteSongsIds = {};
   List<SongModel> _favouriteSongsList = [];
-  FavouriteSongsCubit() : super(FavouriteSongsInitial());
+
+  FavouriteSongsCubit({FavouriteSongsDataSource? dataSource})
+      : _dataSource = dataSource ?? FavouriteSongsDataSourceImpl(),
+        super(FavouriteSongsInitial());
+
   bool isFavourite(String songId) => _favouriteSongsIds.contains(songId);
 
   Future<void> fetchFavourites() async {
@@ -16,13 +23,13 @@ class FavouriteSongsCubit extends Cubit<FavouriteSongsState> {
     if (userId == null) return;
     emit(FavouriteSongsLoading());
     try {
-      final List<dynamic> response = await _supabase
-          .from('favourite_songs')
-          .select('song_id,songs(*)')
-          .eq('user_id', userId);
-      _favouriteSongsIds = response.map((f) => f['song_id'].toString()).toSet();
-      _favouriteSongsList =
-          response.map((item) => SongModel.fromJson(item['songs'])).toList();
+      final entries = await _dataSource.fetchFavouriteEntries(userId);
+      _favouriteSongsIds = entries.map((f) => f['song_id'].toString()).toSet();
+      _favouriteSongsList = entries
+          .where((item) => item['songs'] != null)
+          .map((item) => SongModel.fromJson(item['songs']))
+          .toList();
+
       emit(FavouriteSongsLoaded(
           favouriteSongsIds: _favouriteSongsIds,
           favouriteSongs: _favouriteSongsList));
@@ -40,7 +47,10 @@ class FavouriteSongsCubit extends Cubit<FavouriteSongsState> {
       emit(FavouriteSongsLoaded(favouriteSongsIds: {}, favouriteSongs: []));
     }
 
-    if (state is! FavouriteSongsLoaded) return;
+    if (state is! FavouriteSongsLoaded) {
+      await fetchFavourites();
+      if (state is! FavouriteSongsLoaded) return;
+    }
 
     bool wasFavourite = _favouriteSongsIds.contains(songId);
 
@@ -64,20 +74,30 @@ class FavouriteSongsCubit extends Cubit<FavouriteSongsState> {
     ));
 
     try {
-      final int numericId = int.parse(songId);
+      final int? numericId = int.tryParse(songId);
+      if (numericId == null) {
+        return;
+      }
+      final songData = {
+        'id': numericId,
+        'title': song.title,
+        'artist': song.artist,
+        'urlbase': song.urlSongsbase,
+        'imageUrl': song.imageUrl,
+        'duration': song.duration,
+        'releaseDate': song.releaseDate.toIso8601String(),
+        'lyrics': song.lyrics,
+      };
       if (wasFavourite) {
-        await _supabase.from('favourite_songs').delete().match({
-          "user_id": userId,
-          "song_id": numericId,
-        });
+        await _dataSource.deleteFavourite(userId, numericId);
       } else {
-        await _supabase.from('favourite_songs').insert({
-          "user_id": userId,
-          "song_id": numericId,
-        });
+        await _dataSource.insertFavourite(userId, numericId, songData);
       }
     } catch (e) {
-      fetchFavourites();
+      // Best-effort persistence: keep the optimistic local state so the
+      // toggle never flickers back. The server write is retried on the
+      // next fetchFavourites().
+      debugPrint('toggleFavourite persistence failed for $songId: $e');
     }
   }
 
@@ -85,12 +105,11 @@ class FavouriteSongsCubit extends Cubit<FavouriteSongsState> {
     final userId = _supabase.auth.currentUser?.id;
     if (userId == null) return [];
     try {
-      final response = await _supabase
-          .from("favourite_songs")
-          .select("Songs(*)")
-          .eq("user_id", userId);
-      final List<dynamic> data = response as List;
-      return data.map((item) => SongModel.fromJson(item['songs'])).toList();
+      final entries = await _dataSource.fetchFavouriteEntries(userId);
+      return entries
+          .where((item) => item['songs'] != null)
+          .map((item) => SongModel.fromJson(item['songs']))
+          .toList();
     } catch (e) {
       return [];
     }

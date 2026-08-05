@@ -19,10 +19,15 @@ class VeromeTrackModel {
     final thumbnails = json['thumbnails'] as List<dynamic>? ?? [];
     final thumbnail = thumbnails.isNotEmpty ? thumbnails.first['url']?.toString() : null;
 
+    final artists = json['artists'] as List<dynamic>?;
+    final artistName = artists != null && artists.isNotEmpty
+        ? artists.first['name']?.toString()
+        : json['artist']?.toString() ?? json['channelTitle']?.toString() ?? '';
+
     return VeromeTrackModel(
-      id: json['id']?.toString() ?? '',
+      id: json['videoId']?.toString() ?? json['id']?.toString() ?? '',
       title: json['title']?.toString() ?? '',
-      artist: json['artist']?.toString() ?? json['channelTitle']?.toString() ?? '',
+      artist: artistName ?? '',
       thumbnail: thumbnail,
       durationMs: json['duration_ms'] as int?,
       streamUrl: json['streamUrl']?.toString(),

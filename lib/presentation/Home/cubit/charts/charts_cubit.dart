@@ -4,11 +4,14 @@ import 'package:spotify/presentation/Home/cubit/charts/charts_state.dart';
 import 'package:spotify/serviece_locator.dart';
 
 class ChartsCubit extends Cubit<ChartsState> {
-  ChartsCubit() : super(ChartsLoading());
+  final GetChartsUsecase _getChartsUsecase;
+  ChartsCubit({GetChartsUsecase? getChartsUsecase})
+      : _getChartsUsecase = getChartsUsecase ?? getIt<GetChartsUsecase>(),
+        super(ChartsLoading());
 
   Future<void> fetchCharts({String country = 'eg'}) async {
     emit(ChartsLoading());
-    final result = await getIt<GetChartsUsecase>().call(param: country);
+    final result = await _getChartsUsecase.call(param: country);
     result.fold(
       (l) => emit(ChartsFailure(l)),
       (songs) => emit(ChartsLoaded(songs: songs)),

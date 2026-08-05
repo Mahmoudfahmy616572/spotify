@@ -10,12 +10,22 @@ import 'package:spotify/presentation/songsPlayPage/songs_play_page.dart';
 import 'cubit/queue_cubit.dart';
 import 'cubit/queue_state.dart';
 
-class QueuePage extends StatelessWidget {
+class QueuePage extends StatefulWidget {
   const QueuePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<QueuePage> createState() => _QueuePageState();
+}
+
+class _QueuePageState extends State<QueuePage> {
+  @override
+  void initState() {
+    super.initState();
     context.read<QueueCubit>().loadQueue();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -83,8 +93,7 @@ class QueuePage extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w600,
-                      color:
-                          Colors.white,
+                      color: Colors.white,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),

@@ -6,8 +6,16 @@ import 'package:spotify/presentation/songsPlayPage/cubit/song_player_cubit.dart'
 import 'package:spotify/presentation/songsPlayPage/cubit/song_player_state.dart';
 import 'package:spotify/presentation/songsPlayPage/songs_play_page.dart';
 
-class MiniPlayer extends StatelessWidget {
+class MiniPlayer extends StatefulWidget {
   const MiniPlayer({super.key});
+
+  @override
+  State<MiniPlayer> createState() => _MiniPlayerState();
+}
+
+class _MiniPlayerState extends State<MiniPlayer> {
+  double _dragOffset = 0;
+  bool _isDraggingDown = false;
 
   @override
   Widget build(BuildContext context) {
@@ -16,28 +24,58 @@ class MiniPlayer extends StatelessWidget {
         if (state is! SongPlayerLoaded) {
           return const SizedBox.shrink();
         }
-        final cubit = context.read<SongPlayerCubit>();
-        if (cubit.playList.isEmpty) {
+        if (state.playlist.isEmpty) {
           return const SizedBox.shrink();
         }
 
-        if (cubit.currentIndex >= cubit.playList.length ||
-            cubit.currentIndex < 0) {
+        if (state.currentIndex >= state.playlist.length ||
+            state.currentIndex < 0) {
           return const SizedBox.shrink();
         }
-        final song = cubit.playList[cubit.currentIndex];
+        final song = state.playlist[state.currentIndex];
+        final cubit = context.read<SongPlayerCubit>();
         return GestureDetector(
+          onVerticalDragUpdate: (details) {
+            if (details.delta.dy > 0) {
+              setState(() {
+                _dragOffset += details.delta.dy;
+                _isDraggingDown = true;
+              });
+            }
+          },
+          onVerticalDragEnd: (details) {
+            if (_isDraggingDown && (_dragOffset > 80 || (details.primaryVelocity ?? 0) > 600)) {
+              cubit.playOrpauseSong();
+              cubit.stopAndDismiss();
+              return;
+            }
+            setState(() {
+              _dragOffset = 0;
+              _isDraggingDown = false;
+            });
+          },
+          onHorizontalDragEnd: (details) {
+            if (_isDraggingDown) return;
+            if (details.primaryVelocity == null) return;
+            if (details.primaryVelocity! < -200) {
+              cubit.playNext();
+            } else if (details.primaryVelocity! > 200) {
+              cubit.playPrevious();
+            }
+          },
           onTap: () {
             Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) => SongsPlayPage(
                           songModel: song,
-                          songs: cubit.playList,
-                          index: cubit.currentIndex,
+                          songs: state.playlist,
+                          index: state.currentIndex,
                         )));
           },
-          child: Container(
+          child: AnimatedContainer(
+            duration: _isDraggingDown ? Duration.zero : const Duration(milliseconds: 200),
+            transform: Matrix4.translationValues(0, _dragOffset * 0.3, 0),
             height: 60.h,
             margin: EdgeInsets.symmetric(horizontal: 8.w, vertical: 5.h),
             padding: EdgeInsets.symmetric(horizontal: 10.w),
@@ -59,13 +97,42 @@ class MiniPlayer extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: 10.w),
-                SizedBox(width: 10.w),
                 Expanded(
-                  child: Text(
-                    "${song.title} - ${song.artist}",
-                    style: TextStyle(
-                        color: Colors.white),
-                    overflow: TextOverflow.ellipsis,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          "${song.title} - ${song.artist}",
+                          style: TextStyle(color: Colors.white),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      SizedBox(width: 6.w),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 1.h),
+                        decoration: BoxDecoration(
+                          color: state.isFullSong
+                              ? Colors.greenAccent.withOpacity(0.15)
+                              : Colors.orangeAccent.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(4.r),
+                          border: Border.all(
+                            color: state.isFullSong
+                                ? Colors.greenAccent.withOpacity(0.4)
+                                : Colors.orangeAccent.withOpacity(0.4),
+                            width: 0.5,
+                          ),
+                        ),
+                        child: Text(
+                          state.isFullSong ? 'FULL' : '30s',
+                          style: TextStyle(
+                            fontSize: 7.sp,
+                            fontWeight: FontWeight.w700,
+                            color: state.isFullSong ? Colors.greenAccent : Colors.orangeAccent,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 IconButton(

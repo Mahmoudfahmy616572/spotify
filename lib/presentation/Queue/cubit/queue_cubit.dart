@@ -11,6 +11,10 @@ class QueueCubit extends Cubit<QueueState> {
   void loadQueue() {
     final playlist = _playerCubit.playList;
     final currentIndex = _playerCubit.currentIndex;
+    if (playlist.isEmpty || currentIndex >= playlist.length - 1) {
+      emit(QueueLoaded(upNext: [], currentPlayingIndex: currentIndex));
+      return;
+    }
     final upNext = playlist.sublist(currentIndex + 1);
     emit(QueueLoaded(upNext: upNext, currentPlayingIndex: currentIndex));
   }

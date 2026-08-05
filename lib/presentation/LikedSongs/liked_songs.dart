@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 import 'package:spotify/common/backButton/back_button.dart';
+import 'package:spotify/core/widgets/shimmer_widgets.dart';
 import 'package:spotify/presentation/LikedSongs/cubit/favourite_songs_cubit.dart';
 import 'package:spotify/presentation/LikedSongs/cubit/favourite_songs_state.dart';
 import 'package:spotify/presentation/songsPlayPage/songs_play_page.dart';
@@ -27,7 +28,7 @@ class LikedsongsPage extends StatelessWidget {
           builder: (context, state) {
         if (state is FavouriteSongsLoading) {
           return const SliverFillRemaining(
-            child: Center(child: CircularProgressIndicator()),
+            child: SongListShimmer(),
           );
         } else if (state is FavouriteSongsLoaded) {
           final likedSongs = state.favouriteSongs;

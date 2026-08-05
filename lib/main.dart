@@ -9,16 +9,27 @@ import 'package:path_provider/path_provider.dart';
 import 'package:spotify/core/config/theme/app_theme.dart';
 import 'package:spotify/presentation/DownloadedSongs/cubit/download_songs_for_offline_cubit.dart';
 import 'package:spotify/presentation/Home/cubit/recently_played/recently_played_cubit.dart';
+import 'package:spotify/presentation/LyricsEmotion/cubit/lyrics_emotion_cubit.dart';
 import 'package:spotify/presentation/MainWrapper/cubit/cubit/navigation_cubit.dart';
 import 'package:spotify/presentation/SearchPage/cubit/cubit/search_songs_cubit.dart';
 import 'package:spotify/presentation/songsPlayPage/cubit/lyrics/lyrics_cubit.dart';
+import 'package:spotify/presentation/songsPlayPage/cubit/music_canvas/music_canvas_cubit.dart';
 import 'package:spotify/presentation/songsPlayPage/cubit/song_player_cubit.dart';
+import 'package:spotify/presentation/songsPlayPage/cubit/sound_dna/sound_dna_cubit.dart';
+import 'package:spotify/presentation/TasteProfile/cubit/taste_profile_cubit.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'presentation/LikedSongs/cubit/favourite_songs_cubit.dart'
     show FavouriteSongsCubit;
 import 'presentation/splash/splash_screen.dart';
 import 'serviece_locator.dart';
+
+class NoOverscrollBehavior extends ScrollBehavior {
+  @override
+  ScrollPhysics getScrollPhysics(BuildContext context) {
+    return const ClampingScrollPhysics();
+  }
+}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +40,13 @@ Future<void> main() async {
   await Hive.openBox('songs_metadata');
   await Hive.openBox('user_session');
   await Hive.openBox('recently_played');
+  await Hive.openBox('lyrics_cache');
+  await Hive.openBox('lyrics_memory');
+  await Hive.openBox('search_history');
+  await Hive.openBox('play_events');
+  await Hive.openBox('skip_records');
+  await Hive.openBox('listen_stats');
+  await Hive.openBox('taste_profile');
 
   HydratedBloc.storage = await HydratedStorage.build(
     storageDirectory: kIsWeb
@@ -58,6 +76,10 @@ class MyApp extends StatelessWidget {
         BlocProvider.value(value: getIt<SearchSongsCubit>()),
         BlocProvider.value(value: getIt<LyricsCubit>()),
         BlocProvider.value(value: getIt<RecentlyPlayedCubit>()),
+        BlocProvider.value(value: getIt<TasteProfileCubit>()),
+        BlocProvider.value(value: getIt<MusicCanvasCubit>()),
+        BlocProvider.value(value: getIt<LyricsEmotionCubit>()),
+        BlocProvider.value(value: getIt<SoundDnaCubit>()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(375, 812),
@@ -68,6 +90,7 @@ class MyApp extends StatelessWidget {
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: ThemeMode.dark,
+            scrollBehavior: NoOverscrollBehavior(),
             home: const SplashScreen(),
           );
         },

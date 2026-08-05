@@ -37,12 +37,12 @@ class DownloadedsongsPage extends StatelessWidget {
                     final dynamic rawData = metaBox.get(songId);
 
                     // 2. SAFETY CHECK: If metadata doesn't exist yet, don't crash
-                    if (rawData == null) {
+                    if (rawData == null || rawData is! Map) {
                       return const SizedBox
                           .shrink(); // Hide the item if metadata is missing
                     }
                     final Map<String, dynamic> songMap =
-                        Map<String, dynamic>.from(rawData as Map);
+                        Map<String, dynamic>.from(rawData);
 
                     final song = SongModel.fromJson(songMap);
                     return ListTile(

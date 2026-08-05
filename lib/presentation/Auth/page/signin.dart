@@ -104,6 +104,7 @@ class _SigninPageState extends State<SigninPage> {
                       email: _emailController.text.toString(),
                       password: _passwordController.text.toString(),
                     ));
+                    if (!mounted) return;
                     result.fold((l) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text(l)),

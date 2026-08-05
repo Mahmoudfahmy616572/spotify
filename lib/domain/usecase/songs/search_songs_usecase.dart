@@ -15,4 +15,13 @@ class SearchSongsUsecase implements Usecase<Either, String> {
       return Left(e.toString());
     }
   }
+
+  Future<Either> searchWithOffset(String query, {int offset = 0, int limit = 20}) async {
+    try {
+      final songs = await getIt<DeezerDataSource>().searchTracks(query, offset: offset, limit: limit);
+      return Right(songs);
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
 }

@@ -10,12 +10,25 @@ List<LyricLine> parseLyrics(String lyrics) {
   return lyrics.split('\n').map((line) {
     final match = regExp.firstMatch(line);
     if (match != null) {
-      final duration = Duration(
-        minutes: int.parse(match.group(1)!),
-        seconds: int.parse(match.group(2)!.split('.')[0]),
-        milliseconds: int.parse(match.group(2)!.split('.')[1]),
-      );
-      return LyricLine(match.group(3)!.trim(), duration);
+      try {
+        final minutes = int.parse(match.group(1)!);
+        final secondsStr = match.group(2)!;
+        final parts = secondsStr.split('.');
+        final seconds = int.parse(parts[0]);
+        final millis = parts.length > 1
+            ? int.parse(parts[1].padRight(3, '0'))
+            : 0;
+        return LyricLine(
+          match.group(3)?.trim() ?? '',
+          Duration(
+            minutes: minutes,
+            seconds: seconds,
+            milliseconds: millis,
+          ),
+        );
+      } catch (_) {
+        return LyricLine("", Duration.zero);
+      }
     }
     return LyricLine("", Duration.zero);
   }).where((l) => l.text.isNotEmpty).toList();

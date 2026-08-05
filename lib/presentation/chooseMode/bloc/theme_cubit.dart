@@ -6,7 +6,15 @@ class ThemeCubit extends HydratedCubit<ThemeMode> {
   void updateTheme(ThemeMode thememode) => emit(thememode);
   @override
   ThemeMode? fromJson(Map<String, dynamic> json) {
-    return ThemeMode.values[json['theme'] as int];
+    try {
+      final index = json['theme'] as int?;
+      if (index == null || index < 0 || index >= ThemeMode.values.length) {
+        return ThemeMode.dark;
+      }
+      return ThemeMode.values[index];
+    } catch (_) {
+      return ThemeMode.dark;
+    }
   }
 
   @override

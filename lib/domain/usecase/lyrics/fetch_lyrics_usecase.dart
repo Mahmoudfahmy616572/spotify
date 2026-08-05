@@ -14,15 +14,36 @@ class FetchLyricsUsecase {
     required LyricsParams params,
   }) async {
     try {
-      final lyrics = await getIt<LyricsRepository>().fetchSyncedLyrics(
+      final lyricsRepo = getIt<LyricsRepository>();
+      final lyrics = await lyricsRepo.fetchSyncedLyrics(
         trackName: params.trackName,
         artistName: params.artistName,
       );
       if (lyrics.isNotEmpty) {
         return Right(lyrics);
-      } else {
-        return const Left("No synced lyrics found");
       }
+
+      // Fallback: try plain lyrics and generate timestamps
+      final lyricsDataSource = getIt<LyricsDataSource>();
+      final plainLines = await lyricsDataSource.fetchPlainLyrics(
+        trackName: params.trackName,
+        artistName: params.artistName,
+      );
+      if (plainLines.isNotEmpty) {
+        const totalDuration = Duration(minutes: 3, seconds: 30);
+        final avgLineDuration = Duration(
+          milliseconds: totalDuration.inMilliseconds ~/ plainLines.length,
+        );
+        final syncedLyrics = <LyricLine>[];
+        var currentTime = Duration.zero;
+        for (final line in plainLines) {
+          syncedLyrics.add(LyricLine(line.trim(), currentTime));
+          currentTime += avgLineDuration;
+        }
+        return Right(syncedLyrics);
+      }
+
+      return const Left("No lyrics found");
     } catch (e) {
       return Left("Failed to fetch lyrics: $e");
     }

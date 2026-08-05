@@ -7,6 +7,9 @@ import 'package:spotify/serviece_locator.dart';
 class SigninUsecase implements Usecase<Either, SigninReq> {
   @override
   Future<Either> call({SigninReq? param}) {
-    return getIt<AuthRepo>().signIn(param!);
+    if (param == null) {
+      return Future.value(const Left("Missing sign-in credentials."));
+    }
+    return getIt<AuthRepo>().signIn(param);
   }
 }

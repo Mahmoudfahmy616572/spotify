@@ -14,8 +14,11 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = Supabase.instance.client.auth.currentUser;
     final email = user?.email ?? 'No email';
+    final metadataName = user?.userMetadata?['Full_name'] as String?;
     final name =
-        user?.userMetadata?['Full_name'] ?? user?.email?.split('@').first ?? 'User';
+        (metadataName != null && metadataName.isNotEmpty)
+            ? metadataName
+            : user?.email?.split('@').first ?? 'User';
 
     return Scaffold(
       appBar: AppBar(
@@ -46,7 +49,7 @@ class ProfilePage extends StatelessWidget {
               radius: 50.r,
               backgroundColor: const Color(0xFF42C83C),
               child: Text(
-                name[0].toUpperCase(),
+                name.isNotEmpty ? name[0].toUpperCase() : '?',
                 style: TextStyle(
                   fontSize: 40.sp,
                   fontWeight: FontWeight.bold,

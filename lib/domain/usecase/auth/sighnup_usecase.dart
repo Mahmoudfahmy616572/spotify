@@ -7,6 +7,9 @@ import 'package:spotify/serviece_locator.dart';
 class SighnupUsecase implements Usecase<Either, CreateUserReq> {
   @override
   Future<Either> call({CreateUserReq? param}) {
-    return getIt<AuthRepo>().signUp(param!);
+    if (param == null) {
+      return Future.value(const Left("Missing registration data."));
+    }
+    return getIt<AuthRepo>().signUp(param);
   }
 }

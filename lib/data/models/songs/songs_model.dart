@@ -36,13 +36,20 @@ class SongModel {
       id: json['id'].toString(),
       title: json['title'] ?? 'Unknown Title',
       artist: json['artist'] ?? 'Unknown Artist',
-      urlSongsbase:
-          json['urlbase'], // This should be the filename or path in Storage
-      imageUrl:
-          json['imageUrl'], // This should be the filename or path in Storage
+      urlSongsbase: json['urlbase'] ?? '',
+      imageUrl: json['imageUrl'] ?? '',
       duration: json['duration']?.toString() ?? '0:00',
-      releaseDate: DateTime.parse(json['releaseDate']),
+      releaseDate: _parseDate(json['releaseDate']),
       lyrics: '${json['lyrics'] ?? ''}',
     );
+  }
+
+  static DateTime _parseDate(dynamic value) {
+    if (value == null || value.toString().isEmpty) return DateTime(2000);
+    try {
+      return DateTime.parse(value.toString());
+    } catch (_) {
+      return DateTime(2000);
+    }
   }
 }

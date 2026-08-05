@@ -12,10 +12,11 @@ final class SearchSongsLoading extends SearchSongsState {}
 
 final class SearchSongsLoaded extends SearchSongsState {
   final List<SongModel> songs;
-  SearchSongsLoaded(this.songs);
+  final bool hasMore;
+  SearchSongsLoaded({required this.songs, this.hasMore = false});
 
   @override
-  List<Object?> get props => [songs];
+  List<Object?> get props => [songs, hasMore];
 }
 
 final class SearchSongsError extends SearchSongsState {

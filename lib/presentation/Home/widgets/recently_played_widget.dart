@@ -93,20 +93,22 @@ class RecentlyPlayedWidget extends StatelessWidget {
         );
       },
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 110.w,
-            height: 110.h,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12.r),
-              color: Colors.grey[800],
-            ),
-            clipBehavior: Clip.hardEdge,
-            child: CachedNetworkImage(
-              imageUrl: song.imageUrl,
-              fit: BoxFit.cover,
-              errorWidget: (context, url, error) =>
-                  const Icon(Icons.music_note, color: Colors.white),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12.r),
+            child: Container(
+              width: 110.w,
+              height: 108.h,
+              decoration: BoxDecoration(
+                color: Colors.grey[800],
+              ),
+              child: CachedNetworkImage(
+                imageUrl: song.imageUrl,
+                fit: BoxFit.cover,
+                errorWidget: (context, url, error) =>
+                    const Icon(Icons.music_note, color: Colors.white),
+              ),
             ),
           ),
           SizedBox(height: 6.h),
